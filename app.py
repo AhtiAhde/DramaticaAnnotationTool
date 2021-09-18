@@ -1,18 +1,34 @@
 from flask import Flask
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 
+from dotenv import load_dotenv
+
 import uuid
+import os
+from os import getenv
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(BASEDIR, '.env'))
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
+app.secret_key = getenv("SECRET_KEY")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///postgres" #getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 @app.route("/")
 def index():
     # User should get anonymous but persistent token
-    return "Heipparallaa!"
+    # notice that session['user_id] is a reserved word in Flask
+    if not "user_hash" in session:
+        sql = "INSERT INTO annotool.users (id) VALUES (:id) RETURNING id"
+        result = db.session.execute(sql, {"id":uuid.uuid4()})
+        db.session.commit()
+        session["user_hash"] = result.fetchone()[0]
+    
+    return render_template("index.html", message="index", user=session["user_hash"])
 
 @app.route("/tasks/<int:b_id>/<int:p_id>")
 def tasks():
