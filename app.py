@@ -39,6 +39,27 @@ def book():
     }
     return render_template("book.html", message="book view", book=book)
 
+@app.route("/book", methods=["POST"])
+def character_roles():
+    # POST
+    # Allows to add characters; this might be own resouce that is a
+    # list object of suggested characters and their roles
+    book = {
+        "id": 1,
+        "name": "example",
+        "characters": [
+            {
+                "name": "Jack",
+                "role": "protagonist"
+            },
+            {
+                "name": "Santa",
+                "role": request.form["role"]
+            }
+        ]
+    }
+    return render_template("book.html", message="book view", book=book)
+
 @app.route("/admin/")
 def admin():
     # GET
