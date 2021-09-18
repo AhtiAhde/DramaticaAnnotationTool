@@ -1,0 +1,16 @@
+<title>{{ book.name}}</title>
+<h1>{{ book.name}}</h1>
+<!-- characters list-->
+<ul>
+{% for character in book.characters %}
+<li> {{ character.name }} - {{ character.role or 'no role'}}
+{% endfor %}
+</ul>
+<form action="/book" method="POST">
+<input type="hidden" name="id" value="{{ book.id}}">
+Role of Santa:
+<input type="text" name="role">
+<br>
+<input type="submit" value="Lähetä">
+</form>
+<!-- paragraph view-->
