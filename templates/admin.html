@@ -1,0 +1,27 @@
+{%  if is_admin == false %}
+<title>Admin Login</title>
+
+    <h1>Admin Login {{ is_admin}}:</h1>
+    <form action="/admin/login" method="POST">
+        Admin user:
+        <input type="text" name="user">
+        Admin password:
+        <input type="text" name="pwd">
+        <br>
+        <input type="submit" value="Login">
+    </form>
+{% else %}
+
+<title>Admin Panel</title>
+
+    <h1>Admin Panel</h1>
+
+        <h2>Import books</h2>
+
+        {% for book in import_list %}
+            <li> {{ book[0] }} - {{ book[1]}} - {{ book[2]}}
+        {% endfor %}
+        </ul>
+
+        <h2>Change annotation parameters</h2>
+{% endif %}

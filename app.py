@@ -73,11 +73,48 @@ def character_roles():
 @app.route("/admin/")
 def admin():
     # GET
-    # View configuration parameters for the prioritization and annotation cap
+    # Import books and view configuration parameters for 
+    # the prioritization and annotation cap
+    file_list = os.listdir("static/books")
+    if len(file_list) > 10:
+        file_list = file_list[:10]
+    import_list = []
+    for book_file in file_list:
+        paragraphs = []
+        title = ""
+        book_started = False
+        with open("static/books/" + book_file, "r") as book_text:
+            buffer = 0
+            i = 0
+            for line in book_text:
+                i += 1
+                if book_started:
+                    buffer += len(line)
+                    if len(line) == 1:
+                        paragraphs.append(buffer)
+                        buffer = 0
+                if title == "" and "Title: " in line:
+                    title = line[7:]
+                if not book_started:
+                    if "START OF THIS PROJECT GUTENBERG EBOOK" in line:
+                        book_started = True
+                    if "START OF THE PROJECT GUTENBERG EBOOK" in line:
+                        book_started = True
+        import_list.append((title, len(paragraphs), book_file))
 
+    return render_template("admin.html", is_admin=session.get('is_admin'), import_list=import_list)
     # PUT 
     # change the parameters
-    return "Admin"
+
+@app.route("/admin/login", methods=["POST"])
+def admin_login():
+    print("Does this even work?")
+    user = request.form["user"]
+    pwd = request.form["pwd"]
+    if user == getenv("ADMIN_USER") and pwd == getenv("ADMIN_PASSWORD"):
+        print("Logged in")
+        session['is_admin'] = True
+    return redirect("/admin", code=302)
 
 @app.route("/admin/books")
 def admin_book():

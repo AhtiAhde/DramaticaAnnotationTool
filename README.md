@@ -34,10 +34,18 @@ cd admin_tools
 cp gutenberg/* ../static/books/
 ```
 
+Set environment variables for the local testing `.env`:
+````
+DATABASE_URL=postgresql:///postgres
+SECRET_KEY=123334445645665
+ADMIN_USER=some user name
+ADMIN_PASSWORD=some pass word
+```
+
 To run the app:
 ```
 sudo service postgresql start
 flask run
 ```
 
-Follow the link and try the "/books" section
+Follow the link and try the "/admin" and "/books" section
