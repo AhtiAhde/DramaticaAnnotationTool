@@ -14,7 +14,7 @@ load_dotenv(os.path.join(BASEDIR, '.env'))
 app = Flask(__name__)
 app.secret_key = getenv("SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///postgres" #getenv("DATABASE_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -66,7 +66,7 @@ def character_roles():
     name = request.form["name"]
     role = request.form["role"]
     sql = "INSERT INTO annotool.characters (user_id, name, role) VALUES (:user_id, :name, :role)"
-    db.session.execute(sql, {"user_id":uuid.uuid4(), "name":name, "role":role})
+    db.session.execute(sql, {"user_id":session["user_hash"], "name":name, "role":role})
     db.session.commit()
     return redirect("/books", code=302)
 

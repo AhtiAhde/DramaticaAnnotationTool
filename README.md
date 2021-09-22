@@ -22,3 +22,12 @@ However, this project will focus on the first part, which is annotating the char
 [5]: https://www.gutenberg.org/ 
 [6]: https://dramatica.com/theory/book/characters 
 [7]: https://arxiv.org/pdf/2006.05489.pdf?fbclid=IwAR3sJCFRes5Gf4XKV7BqyjWAbeM5pZ0FcQZpzhyXTX3wzxmDdrEoy40l5cI 
+
+## Testing
+
+```
+sudo service postgresql start
+flask run
+```
+
+Follow the link and try the "/books" section
