@@ -25,6 +25,16 @@ However, this project will focus on the first part, which is annotating the char
 
 ## Testing
 
+To init the database with real books, you can run the scripts at `admin_tools` (work in progress). The `download-100.sh` script will download top 100 eBooks from project Gutenberg and `extract-characters.sh` is a simple script for extracting candidate tokens that might be important characters in the story. I will also create a title extraction script and paragraph extraction scripts.
+
+For now it is perhaps best used so that first download the books and then upload them to the `static/books` directory:
+```
+cd admin_tools
+./download-100.sh
+cp gutenberg/* ../static/books/
+```
+
+To run the app:
 ```
 sudo service postgresql start
 flask run

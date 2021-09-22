@@ -1,0 +1,2 @@
+#!/bin/sh
+wget -O - https://www.gutenberg.org/browse/scores/top | sed -n 's/.*href="\/ebooks\/\([^"]*\).*/\1/p' | head -100 | tail -96 | awk '{print "https://www.gutenberg.org/files/"$1"/"$1"-0.txt"}' | wget -w 1 -P gutenberg/ -i -

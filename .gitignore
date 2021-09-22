@@ -1,3 +1,5 @@
 venv/
+admin_tools/gutenberg/
+static/books/
 __pycache__/
 .env
