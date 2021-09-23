@@ -80,14 +80,27 @@ def admin():
     # Import books and view configuration parameters for 
     # the prioritization and annotation cap
     file_list = os.listdir("static/books")
-    if len(file_list) > 10:
-        file_list = file_list[:10]
-    import_list = []
+    result = db.session.execute("SELECT origin FROM annotool.books")
+    book_res = result.fetchall()
+    already_imported = []
+    for book in book_res:
+        already_imported.append(book[0])
+    print(already_imported)
+    import_files = []
     for book_file in file_list:
+        if book_file in already_imported:
+            continue
+        import_files.append(book_file)
+        if len(import_files) == 10:
+            break
+    print(import_files)
+    import_list = []
+    for import_file in import_files:
         paragraphs = []
         title = ""
         book_started = False
-        with open("static/books/" + book_file, "r") as book_text:
+        print(import_file)
+        with open("static/books/" + import_file, "r") as book_text:
             buffer = 0
             i = 0
             for line in book_text:
@@ -104,7 +117,7 @@ def admin():
                         book_started = True
                     if "START OF THE PROJECT GUTENBERG EBOOK" in line:
                         book_started = True
-        import_list.append((title, len(paragraphs), book_file))
+        import_list.append((title, len(paragraphs), import_file))
 
     return render_template("admin.html", is_admin=session.get("is_admin"), import_list=import_list)
     # PUT 
