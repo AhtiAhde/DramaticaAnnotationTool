@@ -8,6 +8,10 @@ import uuid
 import os
 from os import getenv
 
+import re
+
+_RE_COMBINE_WHITESPACE = re.compile(r"\s+")
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
@@ -102,7 +106,7 @@ def admin():
                         book_started = True
         import_list.append((title, len(paragraphs), book_file))
 
-    return render_template("admin.html", is_admin=session.get('is_admin'), import_list=import_list)
+    return render_template("admin.html", is_admin=session.get("is_admin"), import_list=import_list)
     # PUT 
     # change the parameters
 
@@ -113,17 +117,66 @@ def admin_login():
     pwd = request.form["pwd"]
     if user == getenv("ADMIN_USER") and pwd == getenv("ADMIN_PASSWORD"):
         print("Logged in")
-        session['is_admin'] = True
+        session["is_admin"] = True
     return redirect("/admin", code=302)
 
-@app.route("/admin/books")
+@app.route("/admin/books", methods=["POST"])
 def admin_book():
+    if not session.get("is_admin", False):
+        return "Unauthorized"
+    
     # GET
     # View of annotation counts per book and paragraphs
 
     # POST
     # Allows admin to submit new books and proposed list of characters
+    book_id = request.form["book-id"]
+    file_list = os.listdir("static/books")
+    if book_id not in file_list:
+        return "Invalid book id"
+    
+    paragraphs = []
+    title = ""
+    book_started = False
+    with open("static/books/" + book_id, "r") as book_text:
+        buffer = ""
+        i = 0
+        for line in book_text:
+            i += 1
+            if book_started:
+                buffer += line
+                # We assume that only paragraphs longer than 15 are meaningful
+                if len(line) == 1:
+                    paragraphs.append(buffer)
+                    buffer = ""
+            if title == "" and "Title: " in line:
+                title = line[7:]
+            if not book_started:
+                if "START OF THIS PROJECT GUTENBERG EBOOK" in line:
+                    book_started = True
+                if "START OF THE PROJECT GUTENBERG EBOOK" in line:
+                    book_started = True
+    
+    sql = "INSERT INTO annotool.books (title, origin) VALUES (:title, :origin) RETURNING id"
+    book_res_id = db.session.execute(sql, {"title":title, "origin":book_id}).fetchone()[0]
+    db.session.commit()
 
+    values = []
+    for i in range(len(paragraphs)):
+        # Replace line breaks and other whitespace characters,
+        # for some reason SQLAlchemy doesn't escape properly with multirow inserts
+        paragraph = _RE_COMBINE_WHITESPACE = re.compile(r"\s+").sub(" ", paragraphs[i]).strip()
+        values.append({
+            "book_id": book_res_id, 
+            "seq_num": i, 
+            "content": paragraph
+        })
+    print(values)
+    sql = "INSERT INTO annotool.paragraphs (book_id, seq_num, content) VALUES(:book_id, :seq_num, :content)"
+    db.session.execute(sql, values)
+    db.session.commit()
+
+    return redirect("/books", code=302)
     # PUT 
     # change the book / paragraph priorities
     return "Admin book"

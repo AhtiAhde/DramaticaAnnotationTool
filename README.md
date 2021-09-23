@@ -49,3 +49,7 @@ flask run
 ```
 
 Follow the link and try the "/admin" and "/books" section
+
+## Notion about usability
+
+While the software should also be visually functional in usability sense, for annotation tools we are also pushed against "effort vs value produced" per user. This means that part of the usability is the problem of having high frequency of relevant paragraphs.

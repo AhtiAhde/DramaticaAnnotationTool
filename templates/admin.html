@@ -19,7 +19,13 @@
         <h2>Import books</h2>
 
         {% for book in import_list %}
-            <li> {{ book[0] }} - {{ book[1]}} - {{ book[2]}}
+            <li> 
+                <span>{{ book[0] }} - {{ book[1]}} - {{ book[2]}}</span>
+                <form action="/admin/books" method="POST">
+                    <input type="hidden" name="book-id" value="{{book[2]}}" />
+                    <input type="submit" value="Import">
+                </form>
+            </li>
         {% endfor %}
         </ul>
 
