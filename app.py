@@ -49,10 +49,17 @@ def book():
     # This route should take user to the book view
     # The view would include the character annotations
     # And also provide access to paragraphs, perhaps paginated view
-    result = db.session.execute("SELECT * FROM annotool.books LIMIT 1")
-    books = result.fetchall()
-    # / Fix this later for single query
-    result = db.session.execute("SELECT * FROM annotool.characters")
+    book_id = int(request.args.get("book_id", -1))
+    
+    if book_id > -1:
+        result = db.session.execute(
+            "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
+            {"book_id": book_id})
+        books = result.fetchall()
+        # / Fix this later for single query
+        result = db.session.execute(
+            "SELECT * FROM annotool.characters WHERE book_id=:book_id",
+            {"book_id": book_id})
     
     print(type(books[0]))
     book = books[0]._asdict()
@@ -199,10 +206,7 @@ def admin_book():
     db.session.execute(sql, characters)
     db.session.commit()
 
-    return redirect("/books", code=302)
-    # PUT 
-    # change the book / paragraph priorities
-    return "Admin book"
+    return redirect("/books?book_id=" + str(book_res_id), code=302)
 
 
 @app.route("/admin/users")
