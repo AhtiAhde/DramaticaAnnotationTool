@@ -95,6 +95,7 @@ def admin():
             break
     print(import_files)
     import_list = []
+
     for import_file in import_files:
         paragraphs = []
         title = ""
@@ -187,6 +188,15 @@ def admin_book():
     print(values)
     sql = "INSERT INTO annotool.paragraphs (book_id, seq_num, content) VALUES(:book_id, :seq_num, :content)"
     db.session.execute(sql, values)
+    db.session.commit()
+
+    stream = os.popen("./admin_tools/extract-characters.sh static/books/" + book_id)
+    characters = []
+    for character in stream.readlines():
+        characters.append({"book_id": book_res_id, "name": character.strip()})
+    print(characters)
+    sql = "INSERT INTO annotool.characters (book_id, name) VALUES(:book_id, :name)"
+    db.session.execute(sql, characters)
     db.session.commit()
 
     return redirect("/books", code=302)
