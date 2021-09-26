@@ -70,6 +70,7 @@ def book():
         books = []
         result = db.session.execute("SELECT * FROM annotool.books")
         for book in result.fetchall():
+            print(book)
             books.append(book._asdict())
 
     # / fix
