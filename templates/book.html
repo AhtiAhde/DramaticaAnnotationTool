@@ -1,17 +1,25 @@
 <title>{{ book.title}}</title>
 <h1>{{ book.title}}</h1>
 <!-- characters list-->
-<ul>
-{% for character in book.characters %}
-<li> {{ character.name }} - {{ character.role or 'no role'}}
-{% endfor %}
-</ul>
-<form action="/books" method="POST">
-<input type="hidden" name="id" value="{{ book.id}}">
-Add role:
-<input type="text" name="name">
-<input type="text" name="role">
-<br>
-<input type="submit" value="Lähetä">
-</form>
-<!-- paragraph view-->
+{%  if book %}
+    <ul>
+    {% for character in book.characters %}
+    <li> {{ character.name }} - {{ character.role or 'no role'}}
+    {% endfor %}
+    </ul>
+    <form action="/books" method="POST">
+    <input type="hidden" name="id" value="{{ book.id}}">
+    Add role:
+    <input type="text" name="name">
+    <input type="text" name="role">
+    <br>
+    <input type="submit" value="Lähetä">
+    </form>
+{% endif %}
+
+{% if books %}
+    <ul>
+    {% for book_item in books %}
+    <li> <a href="/books?book_id={{ book_item.id }}">{{ book_item.title }}</a>
+    {% endfor %}
+{% endif %}

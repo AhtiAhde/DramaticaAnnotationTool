@@ -50,8 +50,10 @@ def book():
     # The view would include the character annotations
     # And also provide access to paragraphs, perhaps paginated view
     book_id = int(request.args.get("book_id", -1))
-    
+    book = False
+    books = False
     if book_id > -1:
+        book = {}
         result = db.session.execute(
             "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
             {"book_id": book_id})
@@ -61,13 +63,18 @@ def book():
             "SELECT * FROM annotool.characters WHERE book_id=:book_id",
             {"book_id": book_id})
     
-    print(type(books[0]))
-    book = books[0]._asdict()
-    book['characters'] = result.fetchall()
+        print(type(books[0]))
+        book = books[0]._asdict()
+        book['characters'] = result.fetchall()
+    else:
+        books = []
+        result = db.session.execute("SELECT * FROM annotool.books")
+        for book in result.fetchall():
+            books.append(book._asdict())
 
     # / fix
 
-    return render_template("book.html", message="book view", book=book)
+    return render_template("book.html", message="book view", books=books, book=book)
 
 @app.route("/books", methods=["POST"])
 def character_roles():
@@ -130,13 +137,12 @@ def admin():
                         book_started = True
         import_list.append((title, len(paragraphs), import_file))
 
-    return render_template("admin.html", is_admin=session.get("is_admin"), import_list=import_list)
+    return render_template("admin.html", is_admin=session.get("is_admin", False), import_list=import_list)
     # PUT 
     # change the parameters
 
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
-    print("Does this even work?")
     user = request.form["user"]
     pwd = request.form["pwd"]
     if user == getenv("ADMIN_USER") and pwd == getenv("ADMIN_PASSWORD"):
@@ -154,8 +160,9 @@ def admin_book():
 
     # POST
     # Allows admin to submit new books and proposed list of characters
-    book_id = request.form["book-id"]
-    file_list = os.listdir("static/books")
+    book_id = request.form["book-id"]## Temporarily disable imports
+    # file_list = os.listdir("static/books")
+    file_list = []
     if book_id not in file_list:
         return "Invalid book id"
     
