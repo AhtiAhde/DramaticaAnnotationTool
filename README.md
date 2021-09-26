@@ -29,9 +29,8 @@ To init the database with real books, you can run the scripts at `admin_tools` (
 
 For now it is perhaps best used so that first download the books and then upload them to the `static/books` directory:
 ```
-cd admin_tools
-./download-100.sh
-cp gutenberg/* ../static/books/
+mkdir -p static/books
+./admin-tools/download-100.sh
 ```
 
 Set environment variables for the local testing `.env`:
