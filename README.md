@@ -29,7 +29,6 @@ To init the database with real books, you can run the scripts at `admin_tools` (
 
 For now it is perhaps best used so that first download the books and then upload them to the `static/books` directory:
 ```
-mkdir -p static/books
 ./admin-tools/download-100.sh
 ```
 
