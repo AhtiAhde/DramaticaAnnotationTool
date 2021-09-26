@@ -63,15 +63,13 @@ def book():
             "SELECT * FROM annotool.characters WHERE book_id=:book_id",
             {"book_id": book_id})
     
-        print(type(books[0]))
-        book = books[0]._asdict()
+        book = dict(books[0])
         book['characters'] = result.fetchall()
     else:
         books = []
         result = db.session.execute("SELECT * FROM annotool.books")
         for book in result.fetchall():
-            print(book)
-            books.append(book._asdict())
+            books.append(dict(book))
 
     # / fix
 
