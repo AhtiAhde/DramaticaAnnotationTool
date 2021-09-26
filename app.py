@@ -86,7 +86,10 @@ def admin():
     # GET
     # Import books and view configuration parameters for 
     # the prioritization and annotation cap
-    file_list = os.listdir("static/books")
+    
+    ## Temporarily disable imports
+    # file_list = os.listdir("static/books")
+    file_list = []
     result = db.session.execute("SELECT origin FROM annotool.books")
     book_res = result.fetchall()
     already_imported = []
