@@ -4,7 +4,11 @@ This is a study project for Helsinki University course. I have a long term goal 
 
 However, this project will focus on the first part, which is annotating the characters per story and then hopefully if I have time to develop also annotation tool for possible character-event pairs from paragraphs of the story.
 
-## Features
+## Current Version
+
+Currently the admin panel and book import features are disabled from Heroku as there is no proper filesystem and S3 buckets must be used instead (or something similar). For this reason only the books section is enabled. You can see a list of books and automatically detected characters for each book. No annotation enabled yet.
+
+## Full Feature Set
 
  * The user gets an anonymous annotation token (which maybe can be registered; maybe also add Are You A Robot feature and possibility to register; considering GDPR related problems here)
  * The user can browse random annotation tasks (either character archetype annotation or paragraph character-event annotation)
@@ -23,7 +27,7 @@ However, this project will focus on the first part, which is annotating the char
 [6]: https://dramatica.com/theory/book/characters 
 [7]: https://arxiv.org/pdf/2006.05489.pdf?fbclid=IwAR3sJCFRes5Gf4XKV7BqyjWAbeM5pZ0FcQZpzhyXTX3wzxmDdrEoy40l5cI 
 
-## Testing
+## Local Testing
 
 To init the database with real books, you can run the scripts at `admin_tools` (work in progress). The `download-100.sh` script will download top 100 eBooks from project Gutenberg and `extract-characters.sh` is a simple script for extracting candidate tokens that might be important characters in the story. I will also create a title extraction script and paragraph extraction scripts.
 
@@ -33,7 +37,7 @@ For now it is perhaps best used so that first download the books and then upload
 ```
 
 Set environment variables for the local testing `.env`:
-````
+```
 DATABASE_URL=postgresql:///postgres
 SECRET_KEY=123334445645665
 ADMIN_USER=some user name
