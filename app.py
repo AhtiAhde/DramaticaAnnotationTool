@@ -72,8 +72,24 @@ def book():
             books.append(dict(book))
 
     # / fix
-
-    return render_template("book.html", message="book view", books=books, book=book)
+    roles = [
+        "Protagonist",
+        "Antagonist",
+        "Guardian",
+        "Contagonist",
+        "Reason",
+        "Emotion",
+        "Sidekick",
+        "Skeptic",
+        "No role",
+        "Not a character"
+    ]
+    return render_template("book.html", 
+        message="book view", 
+        books=books, 
+        book=book, 
+        roles=roles
+    )
 
 @app.route("/books", methods=["POST"])
 def character_roles():

@@ -1,20 +1,23 @@
 <title>{{ book.title}}</title>
 <h1>{{ book.title}}</h1>
 <!-- characters list-->
-{%  if book %}
+{% if book %}
+<form action="/books" method="POST">
+<input type="hidden" name="id" value="{{ book.id}}">
     <ul>
     {% for character in book.characters %}
-    <li> {{ character.name }} - {{ character.role or 'no role'}}
+        <li> {{ character.name }} - 
+        <select name="role-{{ character.name }}"> 
+        {% for role in roles %}
+            <option value="{{ role }}"{% if role == "No role"%} selected{% endif %}> {{ role }} </option>
+        {% endfor %}
+        </select>
     {% endfor %}
     </ul>
-    <form action="/books" method="POST">
-    <input type="hidden" name="id" value="{{ book.id}}">
-    Add role:
-    <input type="text" name="name">
-    <input type="text" name="role">
+    
     <br>
-    <input type="submit" value="Lähetä">
-    </form>
+    <input type="submit" value="Annotate">
+</form>
 {% endif %}
 
 {% if books %}
