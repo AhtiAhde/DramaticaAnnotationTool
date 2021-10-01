@@ -82,7 +82,8 @@ def book():
         "Sidekick",
         "Skeptic",
         "No role",
-        "Not a character"
+        "Not a character",
+        "Unknown"
     ]
     return render_template("book.html", 
         message="book view", 
@@ -96,10 +97,37 @@ def character_roles():
     # POST
     # Allows to add characters; this might be own resouce that is a
     # list object of suggested characters and their roles
-    name = request.form["name"]
-    role = request.form["role"]
-    sql = "INSERT INTO annotool.characters (user_id, name, role) VALUES (:user_id, :name, :role)"
-    db.session.execute(sql, {"user_id":session["user_hash"], "name":name, "role":role})
+    book_id = request.form["id"]
+
+    book = {}
+    result = db.session.execute(
+        "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
+        {"book_id": book_id})
+    books = result.fetchall()
+    # / Fix this later for single query
+    result = db.session.execute(
+        "SELECT * FROM annotool.characters WHERE book_id=:book_id",
+        {"book_id": book_id})
+
+    book = dict(books[0])
+    book['characters'] = result.fetchall()
+
+    char_name_to_id = {}
+    for character in book['characters']:
+        char_name_to_id[character.name] = character.id
+
+    annotations = []
+    for key, value in request.form.items():
+        if "role-" in key:
+            annotations.append({
+                "user_id": session["user_hash"],
+                "char_id": char_name_to_id[key.split('-')[1]],
+                "role": value
+            })
+
+    
+    sql = "INSERT INTO annotool.role_annotations (user_id, char_id, role) VALUES (:user_id, :char_id, :role)"
+    db.session.execute(sql, annotations)
     db.session.commit()
     return redirect("/books", code=302)
 
