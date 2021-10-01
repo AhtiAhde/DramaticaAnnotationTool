@@ -58,10 +58,19 @@ def book():
             "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
             {"book_id": book_id})
         books = result.fetchall()
-        # / Fix this later for single query
-        result = db.session.execute(
-            "SELECT * FROM annotool.characters WHERE book_id=:book_id",
-            {"book_id": book_id})
+
+        result = db.session.execute('''
+            SELECT annotool.characters.name, annotool.role_annotations.role 
+                FROM annotool.characters 
+            LEFT JOIN annotool.role_annotations 
+                ON annotool.characters.id=annotool.role_annotations.char_id 
+            WHERE 
+                annotool.role_annotations.user_id=:user_id 
+                AND annotool.characters.book_id=:book_id''',
+            {
+                "book_id": book_id, 
+                "user_id": session['user_hash']
+            })
     
         book = dict(books[0])
         book['characters'] = result.fetchall()
