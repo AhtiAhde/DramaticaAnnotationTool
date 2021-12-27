@@ -2,6 +2,7 @@
 <h1>{{ book.title}}</h1>
 <!-- characters list-->
 {% if book %}
+<h2> Annotations</h2>
 <form action="/books" method="POST">
 <input type="hidden" name="id" value="{{ book.id}}">
     <ul>

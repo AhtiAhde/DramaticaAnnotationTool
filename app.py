@@ -53,6 +53,7 @@ def book():
     book = False
     books = False
     if book_id > -1:
+        print(session['user_hash'])
         book = {}
         result = db.session.execute(
             "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
@@ -60,13 +61,13 @@ def book():
         books = result.fetchall()
 
         result = db.session.execute('''
-            SELECT annotool.characters.name, annotool.role_annotations.role 
+            SELECT annotool.characters.name, COALESCE(annotool.role_annotations.role, 'Unknown') AS role 
                 FROM annotool.characters 
             LEFT JOIN annotool.role_annotations 
-                ON annotool.characters.id=annotool.role_annotations.char_id 
+                ON (annotool.characters.id=annotool.role_annotations.char_id 
+                    AND annotool.role_annotations.user_id=:user_id)
             WHERE 
-                annotool.role_annotations.user_id=:user_id 
-                AND annotool.characters.book_id=:book_id''',
+                annotool.characters.book_id=:book_id''',
             {
                 "book_id": book_id, 
                 "user_id": session['user_hash']
@@ -74,6 +75,8 @@ def book():
     
         book = dict(books[0])
         book['characters'] = result.fetchall()
+        for character in book['characters']:
+            print(character)
     else:
         books = []
         result = db.session.execute("SELECT * FROM annotool.books")
