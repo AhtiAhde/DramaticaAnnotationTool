@@ -215,7 +215,8 @@ def admin_book():
 
     # POST
     # Allows admin to submit new books and proposed list of characters
-    book_id = request.form["book-id"]## Temporarily disable imports
+    book_id = request.form["book-id"]
+    ## Temporarily disable imports
     # file_list = os.listdir("static/books")
     file_list = []
     if book_id not in file_list:
