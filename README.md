@@ -35,6 +35,18 @@ For now it is perhaps best used so that first download the books and then upload
 ```
 ./admin-tools/download-100.sh
 ```
+Or you can also upload only a few books by Project Gutenberg id's by using:
+```
+./admin-tools/download-id.sh :id_here:
+```
+Heroku Hobby tier only allows 10,000 database rows and one book has ~2,000 paragraph database rows in average. Heroku also lacks file system and for that reason instead of using S3 buckets (I will add that later after the course).
+
+I run the book imports locally with master_mode enabled and at Heroku master_mode disabled. I have been using commands to move the local paragraphs to the Heroku environment:
+```
+pg_dump postgres -O -x > import.psql
+heroku psql < import.psql
+```
+
 
 Set environment variables for the local testing `.env`:
 ```

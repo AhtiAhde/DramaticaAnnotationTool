@@ -10,7 +10,7 @@ from os import getenv
 
 import re
 
-_RE_COMBINE_WHITESPACE = re.compile(r"\s+")
+from modules.book_importer import BookImporter
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -21,6 +21,10 @@ app.secret_key = getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+master_mode = False
+if getenv("MASTER_MODE") == "enabled":
+    master_mode = True
 
 @app.route("/")
 def index():
@@ -143,59 +147,6 @@ def character_roles():
     db.session.commit()
     return redirect("/books", code=302)
 
-@app.route("/admin/")
-def admin():
-    # GET
-    # Import books and view configuration parameters for 
-    # the prioritization and annotation cap
-    
-    ## Temporarily disable imports
-    # file_list = os.listdir("static/books")
-    file_list = []
-    result = db.session.execute("SELECT origin FROM annotool.books")
-    book_res = result.fetchall()
-    already_imported = []
-    for book in book_res:
-        already_imported.append(book[0])
-    print(already_imported)
-    import_files = []
-    for book_file in file_list:
-        if book_file in already_imported:
-            continue
-        import_files.append(book_file)
-        if len(import_files) == 10:
-            break
-    print(import_files)
-    import_list = []
-
-    for import_file in import_files:
-        paragraphs = []
-        title = ""
-        book_started = False
-        print(import_file)
-        with open("static/books/" + import_file, "r") as book_text:
-            buffer = 0
-            i = 0
-            for line in book_text:
-                i += 1
-                if book_started:
-                    buffer += len(line)
-                    if len(line) == 1:
-                        paragraphs.append(buffer)
-                        buffer = 0
-                if title == "" and "Title: " in line:
-                    title = line[7:]
-                if not book_started:
-                    if "START OF THIS PROJECT GUTENBERG EBOOK" in line:
-                        book_started = True
-                    if "START OF THE PROJECT GUTENBERG EBOOK" in line:
-                        book_started = True
-        import_list.append((title, len(paragraphs), import_file))
-
-    return render_template("admin.html", is_admin=session.get("is_admin", False), import_list=import_list)
-    # PUT 
-    # change the parameters
-
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
     user = request.form["user"]
@@ -205,72 +156,34 @@ def admin_login():
         session["is_admin"] = True
     return redirect("/admin", code=302)
 
+@app.route("/admin/")
+def admin():
+    # GET
+    # Import books and view configuration parameters for 
+    # the prioritization and annotation cap
+
+    book_importer = BookImporter(db, master_mode)
+    
+    return render_template(
+        "admin.html", 
+        is_admin=session.get("is_admin", False), 
+        import_list=book_importer.parse_book_import_list())
+    # PUT 
+    # change the parameters
+
 @app.route("/admin/books", methods=["POST"])
 def admin_book():
     if not session.get("is_admin", False):
         return "Unauthorized"
-    
     # GET
     # View of annotation counts per book and paragraphs
 
     # POST
     # Allows admin to submit new books and proposed list of characters
-    book_id = request.form["book-id"]
-    ## Temporarily disable imports
-    # file_list = os.listdir("static/books")
-    file_list = []
-    if book_id not in file_list:
+    book_importer = BookImporter(db, master_mode)
+    book_res_id = book_importer.import_book(request.form["book-id"])
+    if book_res_id < 0:
         return "Invalid book id"
-    
-    paragraphs = []
-    title = ""
-    book_started = False
-    with open("static/books/" + book_id, "r") as book_text:
-        buffer = ""
-        i = 0
-        for line in book_text:
-            i += 1
-            if book_started:
-                buffer += line
-                # We assume that only paragraphs longer than 15 are meaningful
-                if len(line) == 1:
-                    paragraphs.append(buffer)
-                    buffer = ""
-            if title == "" and "Title: " in line:
-                title = line[7:]
-            if not book_started:
-                if "START OF THIS PROJECT GUTENBERG EBOOK" in line:
-                    book_started = True
-                if "START OF THE PROJECT GUTENBERG EBOOK" in line:
-                    book_started = True
-    
-    sql = "INSERT INTO annotool.books (title, origin) VALUES (:title, :origin) RETURNING id"
-    book_res_id = db.session.execute(sql, {"title":title, "origin":book_id}).fetchone()[0]
-    db.session.commit()
-
-    values = []
-    for i in range(len(paragraphs)):
-        # Replace line breaks and other whitespace characters,
-        # for some reason SQLAlchemy doesn't escape properly with multirow inserts
-        paragraph = _RE_COMBINE_WHITESPACE = re.compile(r"\s+").sub(" ", paragraphs[i]).strip()
-        values.append({
-            "book_id": book_res_id, 
-            "seq_num": i, 
-            "content": paragraph
-        })
-    print(values)
-    sql = "INSERT INTO annotool.paragraphs (book_id, seq_num, content) VALUES(:book_id, :seq_num, :content)"
-    db.session.execute(sql, values)
-    db.session.commit()
-
-    stream = os.popen("./admin_tools/extract-characters.sh static/books/" + book_id)
-    characters = []
-    for character in stream.readlines():
-        characters.append({"book_id": book_res_id, "name": character.strip()})
-    print(characters)
-    sql = "INSERT INTO annotool.characters (book_id, name) VALUES(:book_id, :name)"
-    db.session.execute(sql, characters)
-    db.session.commit()
 
     return redirect("/books?book_id=" + str(book_res_id), code=302)
 
