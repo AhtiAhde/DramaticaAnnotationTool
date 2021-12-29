@@ -8,9 +8,8 @@ import uuid
 import os
 from os import getenv
 
-import re
-
 from modules.book_importer import BookImporter
+from modules.book import Book
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -56,51 +55,14 @@ def book():
     book_id = int(request.args.get("book_id", -1))
     book = False
     books = False
+    book_obj = Book(db)
     if book_id > -1:
-        print(session['user_hash'])
-        book = {}
-        result = db.session.execute(
-            "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
-            {"book_id": book_id})
-        books = result.fetchall()
-
-        result = db.session.execute('''
-            SELECT annotool.characters.name, COALESCE(annotool.role_annotations.role, 'Unknown') AS role 
-                FROM annotool.characters 
-            LEFT JOIN annotool.role_annotations 
-                ON (annotool.characters.id=annotool.role_annotations.char_id 
-                    AND annotool.role_annotations.user_id=:user_id)
-            WHERE 
-                annotool.characters.book_id=:book_id''',
-            {
-                "book_id": book_id, 
-                "user_id": session['user_hash']
-            })
-    
-        book = dict(books[0])
-        book['characters'] = result.fetchall()
-        for character in book['characters']:
-            print(character)
+        book = book_obj.parse_characters(book_id, session['user_hash'])
     else:
-        books = []
-        result = db.session.execute("SELECT * FROM annotool.books")
-        for book in result.fetchall():
-            books.append(dict(book))
-
-    # / fix
-    roles = [
-        "Protagonist",
-        "Antagonist",
-        "Guardian",
-        "Contagonist",
-        "Reason",
-        "Emotion",
-        "Sidekick",
-        "Skeptic",
-        "No role",
-        "Not a character",
-        "Unknown"
-    ]
+        books = book_obj.list_books()
+    
+    roles = book_obj.get_roles()
+    
     return render_template("book.html", 
         message="book view", 
         books=books, 
@@ -113,38 +75,12 @@ def character_roles():
     # POST
     # Allows to add characters; this might be own resouce that is a
     # list object of suggested characters and their roles
-    book_id = request.form["id"]
-
-    book = {}
-    result = db.session.execute(
-        "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
-        {"book_id": book_id})
-    books = result.fetchall()
-    # / Fix this later for single query
-    result = db.session.execute(
-        "SELECT * FROM annotool.characters WHERE book_id=:book_id",
-        {"book_id": book_id})
-
-    book = dict(books[0])
-    book['characters'] = result.fetchall()
-
-    char_name_to_id = {}
-    for character in book['characters']:
-        char_name_to_id[character.name] = character.id
-
-    annotations = []
-    for key, value in request.form.items():
-        if "role-" in key:
-            annotations.append({
-                "user_id": session["user_hash"],
-                "char_id": char_name_to_id[key.split('-')[1]],
-                "role": value
-            })
-
-    
-    sql = "INSERT INTO annotool.role_annotations (user_id, char_id, role) VALUES (:user_id, :char_id, :role)"
-    db.session.execute(sql, annotations)
-    db.session.commit()
+    book = Book(db)
+    book.write_role_annotations(
+        request.form["id"], 
+        session["user_hash"], 
+        request.form.items()
+    )
     return redirect("/books", code=302)
 
 @app.route("/admin/login", methods=["POST"])
