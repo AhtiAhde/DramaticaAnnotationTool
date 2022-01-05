@@ -39,9 +39,9 @@ Or you can also upload only a few books by Project Gutenberg id's by using:
 ```
 ./admin-tools/download-id.sh :id_here:
 ```
-Heroku Hobby tier only allows 10,000 database rows and one book has ~2,000 paragraph database rows in average. Heroku also lacks file system and for that reason instead of using S3 buckets (I will add that later after the course).
+Heroku Hobby tier only allows 10,000 database rows and one book has ~2,000 paragraph database rows in average. Heroku also lacks file system and for that reason instead of using S3 buckets I upload the data as psql dump import (I will add S3 support later after the course).
 
-I run the book imports locally with master_mode enabled and at Heroku master_mode disabled. I have been using commands to move the local paragraphs to the Heroku environment:
+I run the book imports locally with `MASTER_MODE=enabled` enabled (at `.env`) and at Heroku `MASTER_MODE=enabled` (or just empty). I have been using these commands to move the local paragraphs to the Heroku environment:
 ```
 pg_dump postgres -O -x > import.psql
 heroku psql < import.psql
@@ -54,6 +54,7 @@ DATABASE_URL=postgresql:///postgres
 SECRET_KEY=123334445645665
 ADMIN_USER=some user name
 ADMIN_PASSWORD=some pass word
+MASTER_MODE=enabled
 ```
 
 To run the app:
@@ -62,8 +63,8 @@ sudo service postgresql start
 flask run
 ```
 
-Follow the link and try the "/admin" and "/books" section
+Follow the link in console and try the "/admin" and "/books" section
 
 ## Notion about usability
 
-While the software should also be visually functional in usability sense, for annotation tools we are also pushed against "effort vs value produced" per user. This means that part of the usability is the problem of having high frequency of relevant paragraphs.
+While the software should also be visually functional in usability sense, for annotation tools we are also pushed against "effort vs value produced" per user. This means that part of the usability is the problem of having high frequency of relevant paragraphs. I will implement Adaptive Fractal Analysis algorithm for building the priorities for paragraphs on separate course.
