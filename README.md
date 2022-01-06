@@ -6,7 +6,7 @@ However, this project will focus on the first part, which is annotating the char
 
 ## Current Version
 
-Currently the admin panel and book import features are disabled from Heroku as there is no proper filesystem and S3 buckets must be used instead (or something similar). For this reason only the books section is enabled. You can see a list of books and automatically detected characters for each book. No annotation enabled yet.
+Currently the admin panel and book import features are disabled from Heroku as there is no proper filesystem and S3 buckets must be used instead (or something similar). For this reason only the books section is enabled on the web UI. You can see a list of books and automatically detected characters for each book. No annotation enabled yet.
 
 ## Full Feature Set
 

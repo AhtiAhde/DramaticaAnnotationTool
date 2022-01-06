@@ -57,6 +57,8 @@ def book():
     books = False
     book_obj = Book(db)
     if book_id > -1:
+        # Notice that the unannotated characters are cast to 'Unknown' role
+        # at Jinja template 
         book = book_obj.parse_characters(book_id, session['user_hash'])
     else:
         books = book_obj.list_books()
