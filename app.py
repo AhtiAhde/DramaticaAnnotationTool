@@ -37,33 +37,34 @@ def index():
     
     return render_template("index.html", message="index", user=session["user_hash"])
 
-@app.route("/tasks/<int:b_id>/<int:p_id>")
-def tasks():
+@app.route("/tasks/<int:b_id>", methods=["GET"])
+@app.route("/tasks/<int:b_id>/<int:p_id>", methods=["GET"])
+def tasks(b_id, p_id=-1):
     # Random task list, prioritized by the admins
     # Two modes, character role annotation (b_id) and character 
     # behavior annotation in paragraphs (p_id)
     # We will first implement the character role annotation
     # The resource list link gives a redirect to one task
-    return "Taaskeja"
+    return "Taaskeja" + str(b_id) + str(p_id)
 
 @app.route("/books", methods=["GET"])
-def book():
+@app.route("/books/<int:book_id>", methods=["GET"])
+def book(book_id=-1):
     # GET
     # This route should take user to the book view
     # The view would include the character annotations
     # And also provide access to paragraphs, perhaps paginated view
-    book_id = int(request.args.get("book_id", -1))
     book = False
     books = False
+    roles = []
     book_obj = Book(db)
     if book_id > -1:
         # Notice that the unannotated characters are cast to 'Unknown' role
         # at Jinja template 
         book = book_obj.parse_characters(book_id, session['user_hash'])
+        roles = book['roles']
     else:
         books = book_obj.list_books()
-    
-    roles = book_obj.get_roles()
     
     return render_template("book.html", 
         message="book view", 
@@ -72,14 +73,14 @@ def book():
         roles=roles
     )
 
-@app.route("/books", methods=["POST"])
-def character_roles():
+@app.route("/books/<int:book_id>", methods=["POST"])
+def character_roles(book_id):
     # POST
     # Allows to add characters; this might be own resouce that is a
     # list object of suggested characters and their roles
     book = Book(db)
     book.write_role_annotations(
-        request.form["id"], 
+        book_id, 
         session["user_hash"], 
         request.form.items()
     )

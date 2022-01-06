@@ -3,7 +3,7 @@
 <!-- characters list-->
 {% if book %}
 <h2> Annotations</h2>
-<form action="/books" method="POST">
+<form action="/books/{{ book.id}}" method="POST">
 <input type="hidden" name="id" value="{{ book.id}}">
     <ul>
     {% for character in book.characters %}
@@ -28,6 +28,6 @@
 {% if books %}
     <ul>
     {% for book_item in books %}
-    <li> <a href="/books?book_id={{ book_item.id }}">{{ book_item.title }}</a>
+    <li> <a href="/books/{{ book_item.id }}">{{ book_item.title }}</a>
     {% endfor %}
 {% endif %}
