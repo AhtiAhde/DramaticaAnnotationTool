@@ -1,3 +1,5 @@
+from random import randrange
+
 class Book():
     def __init__(self, db):
         self.db = db
@@ -103,3 +105,12 @@ class Book():
             sql = "UPDATE annotool.role_annotations SET user_id=:user_id, role=:role WHERE char_id=:char_id"
             self.db.session.execute(sql, updates)
             self.db.session.commit()
+    
+    ### Used by @app.route("/tasks/<int:b_id>", methods=["GET"]) ###
+    
+    def get_random_paragraph(self, book_id):
+        max_p = self.db.session.execute(
+            "SELECT MAX(id) FROM annotool.paragraphs WHERE book_id=:book_id",
+            {"book_id": book_id}
+            ).fetchall()
+        return randrange(1, max_p[0][0])
