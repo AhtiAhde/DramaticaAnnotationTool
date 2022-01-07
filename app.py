@@ -45,11 +45,21 @@ def tasks(b_id, p_id=-1):
     # behavior annotation in paragraphs (p_id)
     # We will first implement the character role annotation
     # The resource list link gives a redirect to one task
+    book_obj = Book(db)
+
     if p_id == -1:
-        book_obj = Book(db)
         p_id = book_obj.get_random_paragraph(b_id)
         return redirect("/tasks/" + str(b_id) + "/" + str(p_id), code=302)
-    return "Taaskeja" + str(b_id) + str(p_id)
+    
+    paragraph = book_obj.get_paragraph(b_id, p_id).content
+    return render_template(
+        "task.html", 
+        message="Tasks", 
+        user=session["user_hash"],
+        b_id=b_id,
+        p_id=p_id,
+        paragraph=paragraph)
+    
 
 @app.route("/books", methods=["GET"])
 @app.route("/books/<int:book_id>", methods=["GET"])

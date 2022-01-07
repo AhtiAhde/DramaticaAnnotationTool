@@ -1,0 +1,41 @@
+<title>Tasks</title>
+
+<!-- Add previous paragraphs to left and next paragraphs to right-->
+
+<p>{{ paragraph }}</p>
+
+<p> What would best describe the paragraph?</p>
+<form action="/tasks/{{b_id}}/{{p_id}}" method="POST">
+    <p>
+        <input id="has-dialogue" type="checkbox" name="has-dialogue" />
+        <label for="has-dialogue">It has dialogue in it</label>
+    </p>
+    <p>
+        <input id="has-nic" type="checkbox" name="has-nic" />
+        <label for="has-nic">It has unimportant character in it</label>
+    </p>
+    <p>
+        <input id="has-nothing" type="checkbox" name="has-nothing" />
+        <label for="has-nothing">It has nothing of interest</label>
+    </p>
+    <p>
+        <input id="has-ic" type="checkbox" name="has-ic" />
+        <label for="has-ic">It has an important character in it (one of the annotated ones)</label>
+    </p>
+    <p>
+        <input id="has-event" type="checkbox" name="has-event" />
+        <label for="has-event">It looks like an important event</label>
+    </p>
+    <p>
+        <input id="has-dramatica" type="checkbox" name="has-dramatica" />
+        <label for="has-dramatica">It has a Dramatica event</label>
+        <p>List character drop down and potential action descriptions here as radio buttons</p>
+    </p>
+    <p>
+        <input id="has-bug" type="checkbox" name="has-bug" />
+        <label for="has-bug">It had a bug (no text or weird characters, like chapter titles, section divisions etc.)</label>
+    </p>
+    <input type="submit" value="Annotate">
+</form>
+
+<p><a href="/tasks/{{b_id}}">Annotate another paragraph of this book</a></p>

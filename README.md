@@ -68,3 +68,16 @@ Follow the link in console and try the "/admin" and "/books" section
 ## Notion about usability
 
 While the software should also be visually functional in usability sense, for annotation tools we are also pushed against "effort vs value produced" per user. This means that part of the usability is the problem of having high frequency of relevant paragraphs. I will implement Adaptive Fractal Analysis algorithm for building the priorities for paragraphs on separate course.
+
+## TODO's
+
+* Mark to the paragraphs if they have dialogue or not. Also add word count and char count.
+* Create Dramatica module (writing tool)
+* Add previous and next paragraphs features to the annotation view
+* Make list of all Gutenberg books that have movies made of them (maybe later add movie annotation tool; timeline based; notes that can then be turned to proper annotations)
+
+## TODO's for initial release
+
+* Windowing should match BERT's token limit (512). A window has max size of 512 words / tokens. We might want to choose a bit lower limit to avoid problems (like 450). Of course this can also be done in preprocessing step and we could just prefer best usability.
+* Also the methods for further analysis might depend on constant token amount in learning data (I believe paragraphs might contain useful data structures for MAUI like learners). I believe no matter what we must give more context to the user, so the final solution will be a mesh up of specific length utterances divided for paragraphs anyway.
+* It seems like back tracking which characters are acted on in a section of text is important; some automation might be good idea for this (assuming narrator voice tells about protagonist / active voice character; pronouns should refer to mentioned characters in specific manners, for example "you" refers to active character in scene, while "he/her" might refer to other important characters); annotation of characters per pronoun might be useful.

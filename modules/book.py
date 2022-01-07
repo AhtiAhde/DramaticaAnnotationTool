@@ -114,3 +114,11 @@ class Book():
             {"book_id": book_id}
             ).fetchall()
         return randrange(1, max_p[0][0])
+    
+    ### Used by @app.route("/tasks/<int:b_id>/<int:p_id>", methods=["GET"]) ###
+    
+    def get_paragraph(self, book_id, paragraph_id):
+        return self.db.session.execute(
+            "SELECT * FROM annotool.paragraphs WHERE book_id=:book_id AND id=:paragraph_id",
+            {"book_id": book_id, "paragraph_id": paragraph_id}
+            ).fetchone()
