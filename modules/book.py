@@ -1,4 +1,5 @@
 from random import randrange
+from modules.arc import Arc
 
 class Book():
     def __init__(self, db):
@@ -24,6 +25,10 @@ class Book():
                 "book_id": book_id, 
                 "user_id": user_id
             })
+    
+    def _get_arcs(self, book_id, user_id):
+        arcs = Arc(self.db)
+        return arcs.read(book_id, user_id)
         
     # Used by book struct constructed by parse_characters
     def _get_roles(self):
@@ -42,7 +47,7 @@ class Book():
         ]
 
     ### Used by @app.route("/books", methods=["GET"]) with book id ### 
-    def parse_characters(self, book_id, user_id):
+    def parse_book(self, book_id, user_id):
         book = {}
         result = self.db.session.execute(
             "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
@@ -53,6 +58,9 @@ class Book():
         result = self._get_role_annotations(book_id, user_id)    
         book['characters'] = result.fetchall()
         book['roles'] = self._get_roles()
+        
+        result = self._get_arcs(book_id, user_id)
+        book['arcs'] = result.fetchall()
         return book
     
     # Used by @app.route("/books", methods=["GET"]) when book id is not set

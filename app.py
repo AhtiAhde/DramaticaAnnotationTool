@@ -10,6 +10,7 @@ from os import getenv
 
 from modules.book_importer import BookImporter
 from modules.book import Book
+from modules.arc import Arc
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -75,7 +76,7 @@ def book(book_id=-1):
     if book_id > -1:
         # Notice that the unannotated characters are cast to 'Unknown' role
         # at Jinja template 
-        book = book_obj.parse_characters(book_id, session['user_hash'])
+        book = book_obj.parse_book(book_id, session['user_hash'])
         roles = book['roles']
     else:
         books = book_obj.list_books()
@@ -99,6 +100,21 @@ def character_roles(book_id):
         request.form.items()
     )
     return redirect("/books", code=302)
+
+@app.route("/books/<int:book_id>/add_arc", methods=["POST"])
+def add_arc(book_id):
+    form_data = request.form.items()
+    title = request.form['title']
+    short_desc = request.form['short_desc']
+
+    arc = Arc(db)
+    arc.create(
+        book_id,
+        session['user_hash'],
+        title,
+        short_desc)
+    
+    return redirect("/books/" + str(book_id), code=302)
 
 @app.route("/admin/login", methods=["POST"])
 def admin_login():

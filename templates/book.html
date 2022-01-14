@@ -2,29 +2,142 @@
 <h1>{{ book.title}}</h1>
 <!-- characters list-->
 {% if book %}
-<h2> Annotations</h2>
-<form action="/books/{{ book.id}}" method="POST">
-<input type="hidden" name="id" value="{{ book.id}}">
-    <ul>
-    {% for character in book.characters %}
-        <li> {{ character.name }} - 
-        <select name="role-{{ character.name }}"> 
-        {% for role in roles %}
-            {% if role == "Unknown" and character.role is none%}
-                <option value="{{ role }}" selected> {{ role }} </option>
-            {% else %}
-                <option value="{{ role }}"{% if role == character.role %} selected{% endif %}> {{ role }} </option>
-            {% endif %}
+    <h2> Annotations</h2>
+    <form action="/books/{{ book.id}}" method="POST">
+    <input type="hidden" name="id" value="{{ book.id}}">
+        <ul>
+        {% for character in book.characters %}
+            <li> {{ character.name }} - 
+            <select name="role-{{ character.name }}"> 
+            {% for role in roles %}
+                {% if role == "Unknown" and character.role is none%}
+                    <option value="{{ role }}" selected> {{ role }} </option>
+                {% else %}
+                    <option value="{{ role }}"{% if role == character.role %} selected{% endif %}> {{ role }} </option>
+                {% endif %}
+            {% endfor %}
+            </select>
         {% endfor %}
-        </select>
+        </ul>
+        
+        <br>
+        <input type="submit" value="Annotate">
+    </form>
+    
+    <h2>Add story arc</h2>
+    <p>Story arcs are the primary structure for annotations. We support MICE arcs (Mary Robinette Kowal, originally Orson Scott Card), Promises-Progresses-Payoffs arcs (Brandon Sanderson), and Dramatica plot point and theme arcs (Chris Huntley). You can add known dramatic arcs in the book view and later annotate which paragraphs consist of these dramatic elements; later I will add functionality for users to share their hunches on dramatic arcs that ought to be part of the story.</p>
+
+    <form action="/books/{{ book.id }}/add_arc" method="POST">
+        <label for="title">
+            Title: <input type="text" name="title" value="" />
+        </label>
+        <label for="short_desc">
+            Short description: <input type="text" name="short_desc" value="" />
+        </label>
+        <input type="submit" value="Submit" />
+    </form>
+    
+    <h3>Existing Annotations </h3>
+    {% for arc in book.arcs %}
+        <h4><b>{{arc.title}}: </b>{{arc.short_desc}}</h4>
+        <form id="arc-{{arc.id}}" action="/books/{{ book.id }}/add_arc" method="POST">
+            <input type="hidden" value="{{arc.id}}" />
+            <p>Choose MICE arc component:</p>
+            <label for="mileau-{{arc.id}}">
+                Mileau <input id="mileau-{{arc.id}}" type="radio" name="mice" value="mileau" />
+            </label>
+            <label for="inquiry-{{arc.id}}">
+                Inquiry <input id="inquiry-{{arc.id}}" type="radio" name="mice" value="inquiry" />
+            </label>
+            <label for="character-{{arc.id}}">
+                Character <input id="character-{{arc.id}}" type="radio" name="mice" value="character" />
+            </label>
+            <label for="event-{{arc.id}}">
+                Event <input id="event-{{arc.id}}" type="radio" name="mice" value="inquiry" />
+            </label>
+            <lable for="start-event-{{arc.id}}">
+                Describe the start event:
+                <input id="start-event-{{arc.id}}" name="start-event"  type="text" />
+            </label>
+            <lable for="end-event-{{arc.id}}">
+                Describe the end event:
+                <input id="end-event-{{arc.id}}" name="end-event" type="text" />
+            </label>
+            <p>Add Promise-Progress-Payoff frame?</p>
+            <label for="ppp-{{arc.id}}">
+                Add: 
+                <input id="ppp-{{arc.id}}" type="checkbox" />
+            </label>
+            
+            <p>Does this arc fulfill a Dramatica Plot Point of a specific theme?</p>
+            <label for="dramatica-pp-{{arc.id}}">
+                Choose Plot Point: 
+                <select id="dramatica-pp-{{arc.id}}" name="dramatica-pp">
+                    <option value="goal">Goal</option>
+                    <option value="requirements">Requirements</option>
+                    <option value="consequences">Consequences</option>
+                    <option value="forewarnings">Forewarnings</option>
+                    <option value="dividends">Dividends</option>
+                    <option value="costs">Costs</option>
+                    <option value="prerequisites">Prerequisites</option>
+                    <option value="preconditions">Preconditions</option>
+                </select>
+            </label>
+            <label for="dramatica-pp-theme-{{arc.id}}">
+                Choose Theme: 
+                <select id="dramatica-pp-theme{{arc.id}}" name="dramatica-pp-theme">
+                    <option value="past">Past</option>
+                    <option value="progress">Progress</option>
+                    <option value="future">Future</option>
+                    <option value="present">Present</option>
+                    <option value="understanding">Understanding</option>
+                    <option value="doing">Doing</option>
+                    <option value="obtaining">Obtaining</option>
+                    <option value="learning">Learning</option>
+                    <option value="conceptualization">Conceptualization</option>
+                    <option value="being">Being</option>
+                    <option value="becoming">Becoming</option>
+                    <option value="conceiving">Conceiving</option>
+                    <option value="memory">Memory</option>
+                    <option value="preconscious">Preconscious</option>
+                    <option value="subconscious">Subconscious</option>
+                    <option value="conscious">Conscious</option>
+                </select>
+            </label>
+        </form>
+
     {% endfor %}
+
+    <h3>General Instructions</h3>
+    <p>I believe MICE quotient is the easiest to spot. Also Sanderson's Promises, Progresses and Payoffs are quite easy and it could be claimed that each MICE aspect has Promise and Payoff, for example, the Inquiry has a Promise of a Question and a Payoff of an Answer. However, the progress parts are not so evident, but they are probably easy to find. What makes things interesting is that some of the Promises, Progresses and Payoffs are actually thematic elements of Dramatica and then it becomes that some of the MICE components might also serve as Dramatica Plot Points if there is a full Progressive arc containing all the subelements of a Plot Point.</p>
+
+    <h3>Add MICE Arc</h3>
+    <p>MICE quotient describes whole story, an act or a scene. All MICE quotients can be seen as structures that wrap each other, like HTML elements. Narratives are often resolved quickly while the narrative potential is built up more slowly. Here are the MICE concepts:</p>
+    <ul>
+        <li><b>Mileau:</b> Does a character leave and return to something (not necessarily a place, can also be emotion etc.)?</li>
+        <li><b>Inquiry:</b> Does a characer present a question that gets answered?</li>
+        <li><b>Character:</b> Does a character experience a discomfort, which gets resolved or dealt in some manner?</li>
+        <li><b>Event:</b> Does a catastrophic sequence of actions start and get overcome or realized?</li>
+    </ul>
+
+    <h3>Add Promises, Progresses and Payoffs Arc</h3>
+    <p>Narratives start from ironic foreshadowing of what might happen. Often authors give quite obvious hints for audience abou wher the story is going. Narrative arcs tend to start from a Promise, an idea that something will be dealt with. Then we are reminded about the Promise by Progress events, and finally there will be a Payoff, where audience is rewarded with a resolution.</p>
+
+    <h3>Add Dramatica Plot Points</h3>
+    <p>Dramatica Plot Points are grand global attributes of a complete story:</p>
+    <ul>
+        <li><b>Goal: TODO</b></li>
+        <li><b>Requirements: TODO</b></li>
+        <li><b>Consequences: TODO</b></li>
+        <li><b>Forewarnings: TODO</b></li>
+        <li><b>Dividends: TODO</b></li>
+        <li><b>Costs: TODO</b></li>
+        <li><b>Prerequisites: TODO</b></li>
+        <li><b>Preconditions: TODO</b></li>
     </ul>
     
-    <br>
-    <input type="submit" value="Annotate">
-</form>
 
-<p><a href="/tasks/{{ book.id}}">Annotate paragraphs of this book</a></p>
+    <p><a href="/tasks/{{ book.id}}">Annotate paragraphs of this book</a></p>
 {% endif %}
 
 {% if books %}
