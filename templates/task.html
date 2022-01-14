@@ -7,16 +7,16 @@
 <p> What would best describe the paragraph?</p>
 <form action="/tasks/{{b_id}}/{{p_id}}" method="POST">
     <p>
+        <input id="has-nothing" type="checkbox" name="has-nothing" />
+        <label for="has-nothing">It has nothing of interest</label>
+    </p>
+    <p>
         <input id="has-dialogue" type="checkbox" name="has-dialogue" />
         <label for="has-dialogue">It has dialogue in it</label>
     </p>
     <p>
         <input id="has-nic" type="checkbox" name="has-nic" />
         <label for="has-nic">It has unimportant character in it</label>
-    </p>
-    <p>
-        <input id="has-nothing" type="checkbox" name="has-nothing" />
-        <label for="has-nothing">It has nothing of interest</label>
     </p>
     <p>
         <input id="has-ic" type="checkbox" name="has-ic" />
@@ -27,9 +27,24 @@
         <label for="has-event">It looks like an important event</label>
     </p>
     <p>
-        <input id="has-dramatica" type="checkbox" name="has-dramatica" />
-        <label for="has-dramatica">It has a Dramatica event</label>
+        <input id="has-dramatica-element" type="checkbox" name="has-dramatica-element" />
+        <label for="has-dramatica-element">It has a Dramatica element event</label>
         <p>List character drop down and potential action descriptions here as radio buttons</p>
+    </p>
+    <p>
+        <input id="has-dramatica-pp" type="checkbox" name="has-dramatica-pp" />
+        <label for="has-dramatica-pp">It has a Dramatica plot event</label>
+        <p>List character drop down and potential action descriptions here as radio buttons</p>
+    </p>
+    <p>
+        <input id="has-mice" type="checkbox" name="has-mice" />
+        <label for="has-mice">It has a MICE event</label>
+        <p>List of event types and wether it has start or end of it</p>
+    </p>
+    <p>
+        <input id="has-ppp" type="checkbox" name="has-ppp" />
+        <label for="has-ppp">It has a PPP event</label>
+        <p>Only gives annotation for phases; maybe unresolved promises could be listed</p>
     </p>
     <p>
         <input id="has-bug" type="checkbox" name="has-bug" />
