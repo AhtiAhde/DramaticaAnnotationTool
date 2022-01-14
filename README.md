@@ -81,3 +81,11 @@ While the software should also be visually functional in usability sense, for an
 * Windowing should match BERT's token limit (512). A window has max size of 512 words / tokens. We might want to choose a bit lower limit to avoid problems (like 450). Of course this can also be done in preprocessing step and we could just prefer best usability.
 * Also the methods for further analysis might depend on constant token amount in learning data (I believe paragraphs might contain useful data structures for MAUI like learners). I believe no matter what we must give more context to the user, so the final solution will be a mesh up of specific length utterances divided for paragraphs anyway.
 * It seems like back tracking which characters are acted on in a section of text is important; some automation might be good idea for this (assuming narrator voice tells about protagonist / active voice character; pronouns should refer to mentioned characters in specific manners, for example "you" refers to active character in scene, while "he/her" might refer to other important characters); annotation of characters per pronoun might be useful.
+
+## TODO's for social features
+
+* The dramatic arcs ought to be shared. However, deleting or editing a shared dramatic arc would be problematic. Instead the social features will be based on social negotiations about the correct format.
+* Community Proposal will be a social global suggestion, a bit like Reddit or Stackoverflow posts.
+* When a user has annotated overlapping paragraphs with another user a Community Proposal suggestion is made
+* When a user has annotated paragraphs that belong to Community Proposal, they are suggested to import or merge their contributions
+* A Community Proposal could be a collection of voted components of which one is chose as the official or "primary" (I think "secondaries" etc. different interpretations would be beneficial)
