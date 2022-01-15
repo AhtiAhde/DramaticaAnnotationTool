@@ -33,28 +33,14 @@ class Mice():
             }
         ).fetchall()
     
-    # def update_mice_type(self, id, mice_type, commit=True):
     def update_mice_type(self, new_mice, commit=True):
         sql = "UPDATE annotool.meta_mice SET mice_type=:mice_type WHERE id=:id"
-        self.db.session.execute(
-            sql, 
-            {
-                "id": new_mice['id'],
-                "mice_type": new_mice['mice_type']
-            }
-        )
         self.db.session.execute(sql, new_mice)
         if commit:
             self.db.session.commit()
         
     def update_annotation_note(self, new_mice, commit=True):
         sql = "UPDATE annotool.meta_mice SET annotation_note=:annotation_note WHERE id=:id"
-        self.db.session.execute(
-            sql, 
-            {
-                "id": new_mice['id'], 
-                "annotation_note": new_mice['annotation_note']
-            }
-        )
+        self.db.session.execute(sql, new_mice)
         if commit:
             self.db.session.commit()
