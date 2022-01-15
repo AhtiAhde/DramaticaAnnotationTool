@@ -59,8 +59,7 @@ class Book():
         book['characters'] = result.fetchall()
         book['roles'] = self._get_roles()
         
-        result = self._get_arcs(book_id, user_id)
-        book['arcs'] = result.fetchall()
+        book['arcs'] = self._get_arcs(book_id, user_id)
         return book
     
     # Used by @app.route("/books", methods=["GET"]) when book id is not set

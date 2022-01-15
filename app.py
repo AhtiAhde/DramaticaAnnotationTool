@@ -103,7 +103,6 @@ def character_roles(book_id):
 
 @app.route("/books/<int:book_id>/add_arc", methods=["POST"])
 def add_arc(book_id):
-    form_data = request.form.items()
     title = request.form['title']
     short_desc = request.form['short_desc']
 
@@ -113,6 +112,19 @@ def add_arc(book_id):
         session['user_hash'],
         title,
         short_desc)
+    
+    return redirect("/books/" + str(book_id), code=302)
+
+
+@app.route("/books/<int:book_id>/modify_arc/<int:arc_id>", methods=["POST"])
+def modify_arc(book_id, arc_id):
+    arc = Arc(db)
+    arc.update_annotations(
+        book_id,
+        session['user_hash'],
+        arc_id, 
+        request.form
+    )
     
     return redirect("/books/" + str(book_id), code=302)
 

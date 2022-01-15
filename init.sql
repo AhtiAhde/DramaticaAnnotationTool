@@ -13,10 +13,11 @@ CREATE TABLE annotool.role_annotations (id SERIAL PRIMARY KEY, user_id UUID NOT 
 CREATE TYPE annotool.dramatica_plot_point AS ENUM ('goal', 'requirements', 'consequences', 'forewarnings', 'dividends', 'costs', 'prerequisites', 'preconditions')
 CREATE TYPE annotool.mice_type AS ENUM ('mileau', 'inquiry', 'character', 'event');
 CREATE TYPE annotool.ppp_phase AS ENUM ('promise', 'progress', 'payoff');
+CREATE TYPE annotool.aux_type AS ENUM ('nothing', 'dialogue', 'nic', 'ic', 'event', 'undef_arc', 'bug');
 
 CREATE TABLE annotool.annotation_arc (id SERIAL PRIMARY KEY, book_id INTEGER, user_id UUID, title TEXT, short_desc TEXT);
-CREATE TABLE annotool.paragraph_annotations (id SERIAL PRIMARY KEY, user_id UUID, arc_id INTEGER);
-CREATE TABLE annotool.meta_dramatica_element (id SERIAL PRIMARY KEY, anno_id INTEGER, element TEXT);
-CREATE TABLE annotool.meta_dramatica_pp (id SERIAL PRIMARY KEY, anno_id INTEGER, pp annotool.dramatica_plot_point, theme TEXT);
-CREATE TABLE annotool.meta_mice (id SERIAL PRIMARY KEY, anno_id INTEGER, mice_type annotool.mice_type, notes TEXT, end_of_id INTEGER);
-CREATE TABLE annotool.meta_ppp (id SERIAL PRIMARY KEY, anno_id INTEGER, phase annotool.ppp_phase, promise_id INTEGER);
+CREATE TABLE annotool.meta_aux (id SERIAL PRIMARY KEY, user_id UUID, paragraph_id INTEGER, aux_type annotool.aux_type);
+CREATE TABLE annotool.meta_dramatica_element (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, element TEXT);
+CREATE TABLE annotool.meta_dramatica_pp (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, pp annotool.dramatica_plot_point, theme TEXT);
+CREATE TABLE annotool.meta_mice (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, mice_type annotool.mice_type, annotation_note TEXT, is_start_event BOOLEAN);
+CREATE TABLE annotool.meta_ppp (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, phase annotool.ppp_phase, promise_id INTEGER);

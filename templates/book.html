@@ -40,28 +40,35 @@
     <h3>Existing Annotations </h3>
     {% for arc in book.arcs %}
         <h4><b>{{arc.title}}: </b>{{arc.short_desc}}</h4>
-        <form id="arc-{{arc.id}}" action="/books/{{ book.id }}/add_arc" method="POST">
+        <form id="arc-{{arc.id}}" action="/books/{{ book.id }}/modify_arc/{{arc.id}}" method="POST">
             <input type="hidden" value="{{arc.id}}" />
-            <p>Choose MICE arc component:</p>
+            <p>Choose MICE arc component {{arc.mice_type|d("")}}:</p>
             <label for="mileau-{{arc.id}}">
-                Mileau <input id="mileau-{{arc.id}}" type="radio" name="mice" value="mileau" />
+                Mileau 
+                <input id="mileau-{{arc.id}}" type="radio" name="mice" value="mileau" 
+                    {% if arc.mice_type|d('') == 'mileau' %}checked{% endif %} />
             </label>
             <label for="inquiry-{{arc.id}}">
-                Inquiry <input id="inquiry-{{arc.id}}" type="radio" name="mice" value="inquiry" />
+                Inquiry <input id="inquiry-{{arc.id}}" type="radio" name="mice" value="inquiry" 
+                {% if arc.mice_type|d('') == 'inquiry' %}checked{% endif %} />
             </label>
             <label for="character-{{arc.id}}">
-                Character <input id="character-{{arc.id}}" type="radio" name="mice" value="character" />
+                Character <input id="character-{{arc.id}}" type="radio" name="mice" value="character"
+                {% if arc.mice_type|d('') == 'character' %}checked{% endif %} />
             </label>
             <label for="event-{{arc.id}}">
-                Event <input id="event-{{arc.id}}" type="radio" name="mice" value="inquiry" />
+                Event <input id="event-{{arc.id}}" type="radio" name="mice" value="event" 
+                {% if arc.mice_type|d('') == 'event' %}checked{% endif %} />
             </label>
             <lable for="start-event-{{arc.id}}">
                 Describe the start event:
-                <input id="start-event-{{arc.id}}" name="start-event"  type="text" />
+                <input id="start-event-{{arc.id}}" name="start-event"  type="text"  
+                    value="{{arc.mice_start|d('')}}" />
             </label>
             <lable for="end-event-{{arc.id}}">
                 Describe the end event:
-                <input id="end-event-{{arc.id}}" name="end-event" type="text" />
+                <input id="end-event-{{arc.id}}" name="end-event" type="text"
+                value="{{arc.mice_end|d('')}}" />
             </label>
             <p>Add Promise-Progress-Payoff frame?</p>
             <label for="ppp-{{arc.id}}">
@@ -104,6 +111,7 @@
                     <option value="conscious">Conscious</option>
                 </select>
             </label>
+            <input type="submit" value="Save" />
         </form>
 
     {% endfor %}
