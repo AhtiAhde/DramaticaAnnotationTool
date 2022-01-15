@@ -20,4 +20,4 @@ CREATE TABLE annotool.meta_aux (id SERIAL PRIMARY KEY, user_id UUID, paragraph_i
 CREATE TABLE annotool.meta_dramatica_element (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, element TEXT);
 CREATE TABLE annotool.meta_dramatica_pp (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, pp annotool.dramatica_plot_point, theme TEXT);
 CREATE TABLE annotool.meta_mice (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, mice_type annotool.mice_type, annotation_note TEXT, is_start_event BOOLEAN);
-CREATE TABLE annotool.meta_ppp (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, phase annotool.ppp_phase, promise_id INTEGER);
+CREATE TABLE annotool.meta_ppp (id SERIAL PRIMARY KEY, arc_id INTEGER, paragraph_id INTEGER, phase annotool.ppp_phase, annotation_note TEXT);

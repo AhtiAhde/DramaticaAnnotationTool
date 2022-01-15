@@ -71,9 +71,28 @@
                 value="{{arc.mice_end|d('')}}" />
             </label>
             <p>Add Promise-Progress-Payoff frame?</p>
-            <label for="ppp-{{arc.id}}">
-                Add: 
-                <input id="ppp-{{arc.id}}" type="checkbox" />
+            <lable for="promise-{{arc.id}}">
+                Describe the promise event:
+                <input id="promise-{{arc.id}}" name="promise" type="text"
+                value="{{arc.promise|d('')}}" />
+            </label>
+            <!-- Add for each progress-->
+            {% for progress in arc.progresses %}
+                <lable for="existin-progress-{{arc.id}}-{{progress.id}}">
+                    Edit existing progress events:
+                    <input id="existing-progress-{{arc.id}}-{{progress.id}}" name="existing-progress-{{progress.id}}" type="text"
+                    value="{{progress.annotation_note}}" />
+                </label>
+            {% endfor %}
+            <lable for="new-progress-{{arc.id}}">
+                Describe new progress event:
+                <input id="new-progress-{{arc.id}}" name="new-progress" type="text"
+                value="" />
+            </label>
+            <lable for="payoff-{{arc.id}}">
+                Describe the payoff event:
+                <input id="payoff-{{arc.id}}" name="payoff" type="text"
+                value="{{arc.payoff|d('')}}" />
             </label>
             
             <p>Does this arc fulfill a Dramatica Plot Point of a specific theme?</p>
