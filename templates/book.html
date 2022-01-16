@@ -76,7 +76,7 @@
                 <input id="promise-{{arc.id}}" name="promise" type="text"
                 value="{{arc.promise|d('')}}" />
             </label>
-            <!-- Add for each progress-->
+            <!-- Add for each existing progress; progress is unlimited sequence-->
             {% for progress in arc.progresses %}
                 <lable for="existin-progress-{{arc.id}}-{{progress.id}}">
                     Edit existing progress events:
@@ -99,36 +99,43 @@
             <label for="dramatica-pp-{{arc.id}}">
                 Choose Plot Point: 
                 <select id="dramatica-pp-{{arc.id}}" name="dramatica-pp">
-                    <option value="goal">Goal</option>
-                    <option value="requirements">Requirements</option>
-                    <option value="consequences">Consequences</option>
-                    <option value="forewarnings">Forewarnings</option>
-                    <option value="dividends">Dividends</option>
-                    <option value="costs">Costs</option>
-                    <option value="prerequisites">Prerequisites</option>
-                    <option value="preconditions">Preconditions</option>
+                    <option {% if arc.dramatica_pp|d("uknown") == "unknown" %}selected {% endif %}value="unknown">Unknown</option>
+                    <option {% if arc.dramatica_pp|d("") == "goal" %}selected {% endif %}value="goal">Goal</option>
+                    <option {% if arc.dramatica_pp|d("") == "requirements" %}selected {% endif %}value="requirements">Requirements</option>
+                    <option {% if arc.dramatica_pp|d("") == "consequences" %}selected {% endif %}value="consequences">Consequences</option>
+                    <option {% if arc.dramatica_pp|d("") == "forewarnings" %}selected {% endif %}value="forewarnings">Forewarnings</option>
+                    <option {% if arc.dramatica_pp|d("") == "dividends" %}selected {% endif %}value="dividends">Dividends</option>
+                    <option {% if arc.dramatica_pp|d("") == "costs" %}selected {% endif %}value="costs">Costs</option>
+                    <option {% if arc.dramatica_pp|d("") == "prerequisites" %}selected {% endif %}value="prerequisites">Prerequisites</option>
+                    <option {% if arc.dramatica_pp|d("") == "preconditions" %}selected {% endif %}value="preconditions">Preconditions</option>
                 </select>
             </label>
             <label for="dramatica-pp-theme-{{arc.id}}">
                 Choose Theme: 
                 <select id="dramatica-pp-theme{{arc.id}}" name="dramatica-pp-theme">
-                    <option value="past">Past</option>
-                    <option value="progress">Progress</option>
-                    <option value="future">Future</option>
-                    <option value="present">Present</option>
-                    <option value="understanding">Understanding</option>
-                    <option value="doing">Doing</option>
-                    <option value="obtaining">Obtaining</option>
-                    <option value="learning">Learning</option>
-                    <option value="conceptualization">Conceptualization</option>
-                    <option value="being">Being</option>
-                    <option value="becoming">Becoming</option>
-                    <option value="conceiving">Conceiving</option>
-                    <option value="memory">Memory</option>
-                    <option value="preconscious">Preconscious</option>
-                    <option value="subconscious">Subconscious</option>
-                    <option value="conscious">Conscious</option>
+                    <option {% if arc.dramatica_pp_theme|d("unknown") == "unknown" %}selected {% endif %}value="unknown">Unknown</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "past" %}selected {% endif %}value="past">Past</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "progress" %}selected {% endif %}value="progress">Progress</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "future" %}selected {% endif %}value="future">Future</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "present" %}selected {% endif %}value="present">Present</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "understanding" %}selected {% endif %}value="understanding">Understanding</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "doing" %}selected {% endif %}value="doing">Doing</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "obtaining" %}selected {% endif %}value="obtaining">Obtaining</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "learning" %}selected {% endif %}value="learning">Learning</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "conceptualization" %}selected {% endif %}value="conceptualization">Conceptualization</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "being" %}selected {% endif %}value="being">Being</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "becoming" %}selected {% endif %}value="becoming">Becoming</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "conceiving" %}selected {% endif %}value="conceiving">Conceiving</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "memory" %}selected {% endif %}value="memory">Memory</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "preconscious" %}selected {% endif %}value="preconscious">Preconscious</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "subconscious" %}selected {% endif %}value="subconscious">Subconscious</option>
+                    <option {% if arc.dramatica_pp_theme|d("") == "conscious" %}selected {% endif %}value="conscious">Conscious</option>
                 </select>
+            </label>
+            <lable for="dramatica-pp-note-{{arc.id}}">
+                Describe the Plot Point:
+                <input id="dramatica-pp-note-{{arc.id}}" name="dramatica-pp-note" type="text"
+                value="{{arc.dramatica_pp_note|d('')}}" />
             </label>
             <input type="submit" value="Save" />
         </form>

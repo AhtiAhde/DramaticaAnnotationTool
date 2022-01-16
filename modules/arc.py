@@ -1,5 +1,6 @@
 from modules.meta_mice import Mice
 from modules.meta_ppp import PPP
+from modules.meta_dramatica import Dramatica
 
 class Arc():
     def __init__(self, db):
@@ -41,6 +42,9 @@ class Arc():
         ppp = PPP(self.db)
         ppps = ppp.read_from_arc_list(ids)
         
+        dramatica = Dramatica(self.db)
+        dramaticas = dramatica.read_pp_from_arc_list(ids)
+        
         # parse the final constructs
         ret = []
         for arc in arc_list:
@@ -49,22 +53,31 @@ class Arc():
                 "title": arc.title,
                 "short_desc": arc.short_desc
             }
-            for mice in mices:
-                if mice.arc_id == arc.id:
-                    arc_view['mice_type'] = mice.mice_type
-                    if mice.is_start_event:
-                        arc_view['mice_start'] = mice.annotation_note
+            
+            for mice_instance in mices:
+                if mice_instance.arc_id == arc.id:
+                    arc_view['mice_type'] = mice_instance.mice_type
+                    if mice_instance.is_start_event:
+                        arc_view['mice_start'] = mice_instance.annotation_note
                     else:
-                        arc_view['mice_end'] = mice.annotation_note
+                        arc_view['mice_end'] = mice_instance.annotation_note
+            
             progress_list = []
-            for ppp in ppps:
-                if ppp.phase == "promise":
-                    arc_view['promise'] = ppp.annotation_note
-                if ppp.phase == "payoff":
-                    arc_view['payoff'] = ppp.annotation_note
-                if ppp.phase == "progress":
-                    progress_list.append(ppp)
+            for ppp_instance in ppps:
+                if ppp_instance.arc_id == arc.id:
+                    if ppp_instance.phase == "promise":
+                        arc_view['promise'] = ppp_instance.annotation_note
+                    if ppp_instance.phase == "payoff":
+                        arc_view['payoff'] = ppp_instance.annotation_note
+                    if ppp_instance.phase == "progress":
+                        progress_list.append(ppp_instance)
             arc_view['progresses'] = progress_list
+            
+            for dramatica_instance in dramaticas:
+                if dramatica_instance.arc_id == arc.id:
+                    arc_view['dramatica_pp'] = dramatica_instance.plot_point
+                    arc_view['dramatica_pp_theme'] = dramatica_instance.theme
+                    arc_view['dramatica_pp_note'] = dramatica_instance.annotation_note
             ret.append(arc_view)
         return ret
 
@@ -148,8 +161,36 @@ class Arc():
             elif not payoff:
                 ppp.create_from_arc(arc_id, 'payoff', form_data['payoff'], False)
         
+        
         if form_data['new-progress'] != "":
             ppp.create_from_arc(arc_id, 'progress', form_data['new-progress'], False)
+        
+        # handle Dramatica
+        dramatica = Dramatica(self.db)
+        promise = None
+        payoff = None
+        progresses = []
+        
+        existing_dramatica_pp = dramatica.read_pp_from_arc(arc_id)
+        
+        if len(existing_annotation) == 1:
+            existing_annotation = dict(existing_annotation[0])
+            if existing_dramatica_pp['plot_point'] != form_data['dramatica-pp']:
+                existing_dramatica_pp['plot_point'] = form_data['dramatica-pp']
+            if existing_dramatica_pp['theme'] != form_data['dramatica-pp-theme']:
+                existing_dramatica_pp['theme'] = form_data['dramatica-pp-theme']
+            if existing_dramatica_pp['annotaion_note'] != form_data['dramatica-pp-note']:
+                existing_dramatica_pp['annotation_note'] = form_data['dramatica-pp-note']
+            dramatica.update_pp(existing_dramatica_pp, False)
+        elif form_data['dramatica-pp'] != 'unknown' or form_data['dramatica-pp-theme'] != 'unknown':
+            dramatica.create_pp_from_arc(
+                arc_id,
+                form_data['dramatica-pp'],
+                form_data['dramatica-pp-theme'],
+                form_data['dramatica-pp-note']
+            )
+            
+            
         
         self.db.session.commit()
 
