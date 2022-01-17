@@ -5,6 +5,20 @@
 <p>{{ paragraph }}</p>
 
 <p> What would best describe the paragraph?</p>
+{% if arcs|length > 0 %}
+<form action="/tasks/{{b_id}}/{{p_id}}/arc" method="POST">
+    <p>It has event from existing arc:
+        <select name="arc-selected">
+            <option {% if arc_id|d("-1") == "-1" %}selected{% endif %}>Unselected</option>
+            {% for arc in arcs %}
+                <option {% if arc.id|d("-1") == arc_id %}selected {% endif %}value="{{arc.id}}">{{arc.title}}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Select" />
+    </p>
+</form>
+{% endif %}
+
 <form action="/tasks/{{b_id}}/{{p_id}}" method="POST">
     <p>
         <input id="has-nothing" type="checkbox" name="has-nothing" />
@@ -28,27 +42,27 @@
     </p>
     <p>
         <input id="has-dramatica-element" type="checkbox" name="has-dramatica-element" />
-        <label for="has-dramatica-element">It has a Dramatica element event</label>
+        <label for="has-dramatica-element">It has a potential Dramatica element event</label>
         <p>List character drop down and potential action descriptions here as radio buttons</p>
     </p>
     <p>
         <input id="has-dramatica-pp" type="checkbox" name="has-dramatica-pp" />
-        <label for="has-dramatica-pp">It has a Dramatica plot event</label>
+        <label for="has-dramatica-pp">It has a potential Dramatica plot event</label>
         <p>List character drop down and potential action descriptions here as radio buttons</p>
     </p>
     <p>
         <input id="has-mice" type="checkbox" name="has-mice" />
-        <label for="has-mice">It has a MICE event</label>
+        <label for="has-mice">It has a potential MICE event</label>
         <p>List of event types and wether it has start or end of it</p>
     </p>
     <p>
         <input id="has-ppp" type="checkbox" name="has-ppp" />
-        <label for="has-ppp">It has a PPP event</label>
+        <label for="has-ppp">It has a potential PPP event</label>
         <p>Only gives annotation for phases; maybe unresolved promises could be listed</p>
     </p>
     <p>
         <input id="has-bug" type="checkbox" name="has-bug" />
-        <label for="has-bug">It had a bug (no text or weird characters, like chapter titles, section divisions etc.)</label>
+        <label for="has-bug">It had a bug (no text or weird stuff, like chapter titles, section divisions etc.)</label>
     </p>
     <input type="submit" value="Annotate">
 </form>

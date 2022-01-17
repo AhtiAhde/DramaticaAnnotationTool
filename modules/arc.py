@@ -18,15 +18,63 @@ class Arc():
         )
         self.db.session.commit()
     
+    def read_for_tasks(self, book_id, user_id):
+        arcs = self._read_arcs(book_id, user_id)
+        
+        arc_list = []
+        for arc in arcs:
+            arc_list.append({"id": arc.id, "title": arc.title})
+        return arc_list
+    
+    def read_arc_for_tasks(self, arc_id):
+        arc = self._read_single_arc(arc_id).fetchone()
+        mice_obj = Mice(self.db)
+        mices = mice_obj.read_from_arc(arc_id)
+        ppp_obj = PPP(self.db)
+        ppps = ppp_obj.read_from_arc(arc_id)
+        dramatica_obj = Dramatica(self.db)
+        dramatica_pp = dramatica_obj.read_pp_from_arc(arc_id)
+        
+        arc_view = {
+            "id": arc.id,
+            "title": arc.title,
+            "short_desc": arc.short_desc,
+        }
+        
+        for mice in mices:
+            if mice['is_start_event'] == True:
+                arc_view['mice_type'] = mice['mice_type']
+                arc_view['start_note'] = mice['annotation_note']
+                arc_view['start_id'] = mice['id']
+            else:
+                arc_view['end_note'] = mice['annotation_note']
+                arc_view['end_id'] = mice['id']
+        
+        progresses = []
+        for ppp in ppps:
+            if ppp['phase'] == 'promise':
+                arc_view['promise_note'] = ppp['annotation_note']
+                arc_view['promise_id'] = ppp['id']
+            if ppp['phase'] == 'payoff':
+                arc_view['payoff_note'] = ppp['annotation_note']
+                arc_view['payoff_id'] = ppp['id']
+            if ppp['phase'] == 'progress':
+                progresses.append({
+                    "progress_note": ppp['annotation_note'],
+                    "progress_id": ppp['id']
+                })
+        arc_view['progresses'] = progresses
+        
+        print(dramatica_pp) # TODO: Continue here, there is a bug
+        arc_view['dramatica_pp'] = dramatica_pp['plot_point']
+        arc_view['dramatica_pp_note'] = dramatica_pp['annotation_note']
+        arc_view['dramatica_pp_theme'] = dramatica_pp['theme']
+        
+        return arc_view
+            
+    
     def read(self, book_id, user_id):
-        sql = "SELECT id, title, short_desc FROM annotool.annotation_arc WHERE user_id=:user_id AND book_id=:book_id"
-        arcs = self.db.session.execute(
-            sql,
-            {
-                "user_id": user_id,
-                "book_id": book_id
-            }
-        )
+        arcs = self._read_arcs(book_id, user_id)
         
         ids = []
         arc_list = []
@@ -52,6 +100,25 @@ class Arc():
 
             ret.append(arc_view)
         return ret
+    
+    def _read_arcs(self, book_id, user_id):
+        sql = "SELECT id, title, short_desc FROM annotool.annotation_arc WHERE user_id=:user_id AND book_id=:book_id"
+        return self.db.session.execute(
+            sql,
+            {
+                "user_id": user_id,
+                "book_id": book_id
+            }
+        )
+    
+    def _read_single_arc(self, arc_id):
+        sql = "SELECT id, title, short_desc FROM annotool.annotation_arc WHERE id=:id"
+        return self.db.session.execute(
+            sql,
+            {
+                "id": arc_id
+            }
+        )
 
     def _read_mice(self, ids, arc_id):
         mice = Mice(self.db)

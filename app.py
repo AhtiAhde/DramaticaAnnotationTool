@@ -40,27 +40,43 @@ def index():
 
 @app.route("/tasks/<int:b_id>", methods=["GET"])
 @app.route("/tasks/<int:b_id>/<int:p_id>", methods=["GET"])
-def tasks(b_id, p_id=-1):
+@app.route("/tasks/<int:b_id>/<int:p_id>/<int:arc_id>", methods=["GET"])
+def tasks(b_id, p_id=-1, arc_id=-1):
     # Random task list, prioritized by the admins
     # Two modes, character role annotation (b_id) and character 
     # behavior annotation in paragraphs (p_id)
     # We will first implement the character role annotation
     # The resource list link gives a redirect to one task
     book_obj = Book(db)
-
+    arc_obj = Arc(db)
+    
     if p_id == -1:
         p_id = book_obj.get_random_paragraph(b_id)
         return redirect("/tasks/" + str(b_id) + "/" + str(p_id), code=302)
     
     paragraph = book_obj.get_paragraph(b_id, p_id).content
+    
+    arcs = []
+    arc = None
+    if arc_id == -1:
+        arcs = arc_obj.read_for_tasks(b_id, session['user_hash'])
+    else:
+        arc = arc_obj.read_arc_for_tasks(arc_id)
+    
+    print(arc)
     return render_template(
         "task.html", 
         message="Tasks", 
         user=session["user_hash"],
         b_id=b_id,
         p_id=p_id,
+        arcs=arcs,
+        arc=arc,
         paragraph=paragraph)
-    
+
+@app.route("/tasks/<int:b_id>/<int:p_id>/arc", methods=['POST'])
+def task_arc_redicrect(b_id, p_id=-1):
+    return redirect("/tasks/" + str(b_id) + "/" + str(p_id) + "/" + request.form['arc-selected'])
 
 @app.route("/books", methods=["GET"])
 @app.route("/books/<int:book_id>", methods=["GET"])

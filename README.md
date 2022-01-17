@@ -71,6 +71,7 @@ While the software should also be visually functional in usability sense, for an
 
 ## TODO's
 
+* Promises and Payoffs should have "same as MICE start / end", which would disable the text box and copy the content of MICE description as value of the PPP annotation.
 * Mark to the paragraphs if they have dialogue or not. Also add word count and char count.
 * Create Dramatica module (writing tool)
 * Add previous and next paragraphs features to the annotation view
