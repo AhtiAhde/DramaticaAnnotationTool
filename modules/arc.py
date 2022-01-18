@@ -33,7 +33,7 @@ class Arc():
         ppp_obj = PPP(self.db)
         ppps = ppp_obj.read_from_arc(arc_id)
         dramatica_obj = Dramatica(self.db)
-        dramatica_pp = dramatica_obj.read_pp_from_arc(arc_id)
+        dramatica_pp = dramatica_obj.read_pp_from_arc(arc_id)[0]
         
         arc_view = {
             "id": arc.id,
@@ -65,7 +65,6 @@ class Arc():
                 })
         arc_view['progresses'] = progresses
         
-        print(dramatica_pp) # TODO: Continue here, there is a bug
         arc_view['dramatica_pp'] = dramatica_pp['plot_point']
         arc_view['dramatica_pp_note'] = dramatica_pp['annotation_note']
         arc_view['dramatica_pp_theme'] = dramatica_pp['theme']
@@ -169,6 +168,7 @@ class Arc():
                 note = dramatica_instance.annotation_note
         return plot_point, theme, note       
 
+    # Should perhaps be create or update
     def update_annotations(self, book_id, user_id, arc_id, form_data):
         # check authorization
         sql = "SELECT * FROM annotool.annotation_arc WHERE user_id=:user_id AND book_id=:book_id AND id=:arc_id"
