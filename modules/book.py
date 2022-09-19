@@ -12,15 +12,15 @@ class Book():
         # insert or update problems else where adding cyclomatic code complexity a lot
         return self.db.session.execute('''
             SELECT 
-                annotool.characters.id, 
-                annotool.characters.name, 
-                annotool.role_annotations.role
-            FROM annotool.characters 
-            LEFT JOIN annotool.role_annotations 
-                ON (annotool.characters.id=annotool.role_annotations.char_id 
-                    AND annotool.role_annotations.user_id=:user_id)
+                characters.id, 
+                characters.name, 
+                role_annotations.role
+            FROM characters 
+            LEFT JOIN role_annotations 
+                ON (characters.id=role_annotations.char_id 
+                    AND role_annotations.user_id=:user_id)
             WHERE 
-                annotool.characters.book_id=:book_id''',
+                characters.book_id=:book_id''',
             {
                 "book_id": book_id, 
                 "user_id": user_id
@@ -50,7 +50,7 @@ class Book():
     def parse_book(self, book_id, user_id):
         book = {}
         result = self.db.session.execute(
-            "SELECT * FROM annotool.books WHERE id=:book_id LIMIT 1",
+            "SELECT * FROM books WHERE id=:book_id LIMIT 1",
             {"book_id": book_id})
         books = result.fetchall()
         book = dict(books[0])
@@ -67,7 +67,7 @@ class Book():
     # the router but Flask is Flask...
     def list_books(self):
         books = []
-        result = self.db.session.execute("SELECT * FROM annotool.books")
+        result = self.db.session.execute("SELECT * FROM books")
         for book in result.fetchall():
             books.append(dict(book))
         return books
@@ -104,12 +104,12 @@ class Book():
 
         # persistance operations; we could also use soft updates and store all as inserts
         if len(inserts) > 0:
-            sql = "INSERT INTO annotool.role_annotations (user_id, char_id, role) VALUES (:user_id, :char_id, :role)"
+            sql = "INSERT INTO role_annotations (user_id, char_id, role) VALUES (:user_id, :char_id, :role)"
             self.db.session.execute(sql, inserts)
             self.db.session.commit()
         
         if len(updates) > 0:
-            sql = "UPDATE annotool.role_annotations SET user_id=:user_id, role=:role WHERE char_id=:char_id"
+            sql = "UPDATE role_annotations SET user_id=:user_id, role=:role WHERE char_id=:char_id"
             self.db.session.execute(sql, updates)
             self.db.session.commit()
     
@@ -117,7 +117,7 @@ class Book():
     
     def get_random_paragraph(self, book_id):
         max_p = self.db.session.execute(
-            "SELECT MAX(id) FROM annotool.paragraphs WHERE book_id=:book_id",
+            "SELECT MAX(id) FROM paragraphs WHERE book_id=:book_id",
             {"book_id": book_id}
             ).fetchall()
         return randrange(1, max_p[0][0])
@@ -126,6 +126,6 @@ class Book():
     
     def get_paragraph(self, book_id, paragraph_id):
         return self.db.session.execute(
-            "SELECT * FROM annotool.paragraphs WHERE book_id=:book_id AND id=:paragraph_id",
+            "SELECT * FROM paragraphs WHERE book_id=:book_id AND id=:paragraph_id",
             {"book_id": book_id, "paragraph_id": paragraph_id}
             ).fetchone()

@@ -3,7 +3,7 @@ class PPP():
         self.db = db
     
     def create_from_arc(self, arc_id, phase, annotation_note, commit=True):
-        sql = "INSERT INTO annotool.meta_ppp (arc_id, phase, annotation_note) VALUES (:arc_id, :phase, :annotation_note)"
+        sql = "INSERT INTO meta_ppp (arc_id, phase, annotation_note) VALUES (:arc_id, :phase, :annotation_note)"
         self.db.session.execute(sql, 
             {
                 "arc_id": arc_id, 
@@ -15,7 +15,7 @@ class PPP():
             self.db.session.commit()
     
     def read_from_arc(self, arc_id, commit=True):
-        sql = "SELECT * FROM annotool.meta_ppp WHERE arc_id=:arc_id"
+        sql = "SELECT * FROM meta_ppp WHERE arc_id=:arc_id"
         return self.db.session.execute(
             sql, 
             {
@@ -24,7 +24,7 @@ class PPP():
         ).fetchall()
 
     def read_from_arc_list(self, arc_id_list, commit=True):
-        sql = "SELECT * FROM annotool.meta_ppp WHERE arc_id IN :arc_id_list"
+        sql = "SELECT * FROM meta_ppp WHERE arc_id IN :arc_id_list"
         return self.db.session.execute(
             sql, 
             {
@@ -33,7 +33,7 @@ class PPP():
         ).fetchall()
     
     def update_note(self, new_ppp, commit=True):
-        sql = "UPDATE annotool.meta_ppp SET annotation_note=:annotation_note WHERE id=:id"
+        sql = "UPDATE meta_ppp SET annotation_note=:annotation_note WHERE id=:id"
         self.db.session.execute(sql, new_ppp)
         if commit:
             self.db.session.commit()

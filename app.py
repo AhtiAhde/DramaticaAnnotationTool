@@ -31,7 +31,7 @@ def index():
     # User should get anonymous but persistent token
     # notice that session['user_id] is a reserved word in Flask
     if not "user_hash" in session:
-        sql = "INSERT INTO annotool.users (id) VALUES (:id) RETURNING id"
+        sql = "INSERT INTO users (id) VALUES (:id) RETURNING id"
         result = db.session.execute(sql, {"id":uuid.uuid4()})
         db.session.commit()
         session["user_hash"] = result.fetchone()[0]

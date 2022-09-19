@@ -45,7 +45,7 @@ class BookImporter():
     ### Admin view, list importable books ###
 
     def _fetch_imported_books(self):
-        result = self.db.session.execute("SELECT origin FROM annotool.books")
+        result = self.db.session.execute("SELECT origin FROM books")
         book_res = result.fetchall()
         for book in book_res:
             self.already_imported.append(book[0])
@@ -87,7 +87,7 @@ class BookImporter():
         
         paragraphs, title = self._parse_book_content(import_file)
         
-        sql = "INSERT INTO annotool.books (title, origin) VALUES (:title, :origin) RETURNING id"
+        sql = "INSERT INTO books (title, origin) VALUES (:title, :origin) RETURNING id"
         book_res_id = self.db.session.execute(sql, {"title":title, "origin":import_file}).fetchone()[0]
         self.db.session.commit()
 
@@ -102,7 +102,7 @@ class BookImporter():
                 "content": paragraph
             })
         print(values)
-        sql = "INSERT INTO annotool.paragraphs (book_id, seq_num, content) VALUES(:book_id, :seq_num, :content)"
+        sql = "INSERT INTO paragraphs (book_id, seq_num, content) VALUES(:book_id, :seq_num, :content)"
         self.db.session.execute(sql, values)
         self.db.session.commit()
 
@@ -113,7 +113,7 @@ class BookImporter():
             characters.append({"book_id": book_res_id, "name": character.strip()})
         
         print(characters)
-        sql = "INSERT INTO annotool.characters (book_id, name) VALUES(:book_id, :name)"
+        sql = "INSERT INTO characters (book_id, name) VALUES(:book_id, :name)"
         self.db.session.execute(sql, characters)
         self.db.session.commit()
         

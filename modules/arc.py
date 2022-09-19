@@ -7,7 +7,7 @@ class Arc():
         self.db = db
     
     def create(self, book_id, user_id, title, short_desc):
-        sql = "INSERT INTO annotool.annotation_arc (user_id, book_id, title, short_desc) VALUES (:user_id, :book_id, :title, :short_desc)"
+        sql = "INSERT INTO annotation_arc (user_id, book_id, title, short_desc) VALUES (:user_id, :book_id, :title, :short_desc)"
         self.db.session.execute(sql, 
             {
                 "user_id": user_id, 
@@ -101,7 +101,7 @@ class Arc():
         return ret
     
     def _read_arcs(self, book_id, user_id):
-        sql = "SELECT id, title, short_desc FROM annotool.annotation_arc WHERE user_id=:user_id AND book_id=:book_id"
+        sql = "SELECT id, title, short_desc FROM annotation_arc WHERE user_id=:user_id AND book_id=:book_id"
         return self.db.session.execute(
             sql,
             {
@@ -111,7 +111,7 @@ class Arc():
         )
     
     def _read_single_arc(self, arc_id):
-        sql = "SELECT id, title, short_desc FROM annotool.annotation_arc WHERE id=:id"
+        sql = "SELECT id, title, short_desc FROM annotation_arc WHERE id=:id"
         return self.db.session.execute(
             sql,
             {
@@ -171,7 +171,7 @@ class Arc():
     # Should perhaps be create or update
     def update_annotations(self, book_id, user_id, arc_id, form_data):
         # check authorization
-        sql = "SELECT * FROM annotool.annotation_arc WHERE user_id=:user_id AND book_id=:book_id AND id=:arc_id"
+        sql = "SELECT * FROM annotation_arc WHERE user_id=:user_id AND book_id=:book_id AND id=:arc_id"
         result = self.db.session.execute(
             sql,
             {
