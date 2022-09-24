@@ -11,6 +11,7 @@ from os import getenv
 from modules.book_importer import BookImporter
 from modules.book import Book
 from modules.arc import Arc
+from modules.auth import Auth
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -29,14 +30,13 @@ if getenv("MASTER_MODE") == "enabled":
 @app.route("/")
 def index():
     # User should get anonymous but persistent token
-    # notice that session['user_id] is a reserved word in Flask
     if not "user_hash" in session:
-        sql = "INSERT INTO users (id) VALUES (:id) RETURNING id"
+        sql = "INSERT INTO user_sessions (id) VALUES (:id) RETURNING id"
         result = db.session.execute(sql, {"id":uuid.uuid4()})
         db.session.commit()
         session["user_hash"] = result.fetchone()[0]
     
-    return render_template("index.html", message="index", user=session["user_hash"])
+    return render_template("index.html", message="index", user=session["user_hash"], email=session.get("email", False))
 
 @app.route("/tasks/<int:b_id>", methods=["GET"])
 @app.route("/tasks/<int:b_id>/<int:p_id>", methods=["GET"])
@@ -143,6 +143,58 @@ def modify_arc(book_id, arc_id):
     )
     
     return redirect("/books/" + str(book_id), code=302)
+
+
+@app.route("/register", methods=["GET"])
+def register():
+    return render_template("register.html", 
+        message="register user",
+        email = request.args.get("email", default="", type=str),
+        pwd_mismatch = request.args.get("pwd_mismatch", default="0", type=str)
+    )
+
+@app.route("/register", methods=["POST"])
+def register_user():
+    email = request.form["email"] # add email validator later
+    password = request.form["password"]
+    
+    # Check is password and confirm password match
+    confirm = request.form["confirm-password"]
+    if password != confirm:
+        return redirect("/register?email=" + str(email) + "&pwd_mismatch=1", code=302)
+
+    auth = Auth(db)
+    email = auth.register(email, password, session["user_hash"])
+    
+    if not email:
+        # decide later what to do
+        return render_template("register.html", message="register user failed",)
+
+    session['email'] = email
+
+    return redirect("/", code=302)
+
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.form["email"] # add email validator later
+    password = request.form["password"]
+
+    auth = Auth(db)
+    email = auth.login(email, password, session["user_hash"])
+    if not email:
+        return render_template("index.html", message="Welcome back", invalid_auth="1")
+    
+    session['email'] = email
+
+    return redirect("/", code=302)
+
+
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.pop("user_hash")
+    session.pop("email")
+
+    return redirect("/", code=302)
 
 @app.route("/admin/login", methods=["POST"])
 def admin_login():

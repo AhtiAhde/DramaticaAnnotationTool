@@ -5,3 +5,18 @@
 Try the tool at <a href="/books">the books section</a> or try <a href="/tasks/1">annotating the paragraphs</a> of The Great Gatsby.
 
 Adming login <a href="/admin">here</a>.
+
+{% if email%}
+Log out <a href="/logout">here</a>.
+{% else %}
+Register <a href="/register">here</a>.
+or
+Login
+<form action="/login" method="POST">
+    <label for="email">Email:</label>
+    <input type="text" name="email" />
+    <label for="password">Password:</label>
+    <input type="password" name="password" />
+    <input type="submit" value="Login" />
+</form>
+{% endif %}

@@ -1,0 +1,17 @@
+<title>Register User</title>
+<h1>Register account</h1>
+
+<p>In order to keep track on what texts you have already annotated, this site keeps a session token in your cookies. However, if your cookies get erased or the session expires for other reasons, like browser security updates, your progress will be lost. Your annotations will remain in our databases, safe and sound, but it might be slightly demotivating to get annotation suggestions, which you have already done. For that reason it is good idea to register an email address for being able to login, so that we can always recreate your session cookies.</p>
+
+<form action="/register" method="POST">
+    <label for="email">Email:</label>
+    <input type="text" name="email" value="{{ email }}" />
+    {% if pwd_mismatch == "1"%}
+        <p>Confirmation password and given password didn't match. Try again.</p>
+    {% endif %}
+    <label for="password">Password:</label>
+    <input type="password" name="password" value="" />
+    <label for="confirm-password">Confirm password:</label>
+    <input type="password" name="confirm-password" value="" />
+    <input type="submit" value="Submit" />
+</form>

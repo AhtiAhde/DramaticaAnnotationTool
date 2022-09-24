@@ -7,7 +7,7 @@ class Book():
 
     ### General Helpers ###
     
-    def _get_role_annotations(self, book_id, user_id):
+    def _get_role_annotations(self, book_id, session_id):
         # Using COALESCE here to accomodate the default value will lead to tricky
         # insert or update problems else where adding cyclomatic code complexity a lot
         return self.db.session.execute('''
@@ -18,17 +18,17 @@ class Book():
             FROM characters 
             LEFT JOIN role_annotations 
                 ON (characters.id=role_annotations.char_id 
-                    AND role_annotations.user_id=:user_id)
+                    AND role_annotations.session_id=:session_id)
             WHERE 
                 characters.book_id=:book_id''',
             {
                 "book_id": book_id, 
-                "user_id": user_id
+                "session_id": session_id
             })
     
-    def _get_arcs(self, book_id, user_id):
+    def _get_arcs(self, book_id, session_id):
         arcs = Arc(self.db)
-        return arcs.read(book_id, user_id)
+        return arcs.read(book_id, session_id)
         
     # Used by book struct constructed by parse_characters
     def _get_roles(self):
@@ -47,7 +47,7 @@ class Book():
         ]
 
     ### Used by @app.route("/books", methods=["GET"]) with book id ### 
-    def parse_book(self, book_id, user_id):
+    def parse_book(self, book_id, session_id):
         book = {}
         result = self.db.session.execute(
             "SELECT * FROM books WHERE id=:book_id LIMIT 1",
@@ -55,11 +55,11 @@ class Book():
         books = result.fetchall()
         book = dict(books[0])
         
-        result = self._get_role_annotations(book_id, user_id)    
+        result = self._get_role_annotations(book_id, session_id)    
         book['characters'] = result.fetchall()
         book['roles'] = self._get_roles()
         
-        book['arcs'] = self._get_arcs(book_id, user_id)
+        book['arcs'] = self._get_arcs(book_id, session_id)
         return book
     
     # Used by @app.route("/books", methods=["GET"]) when book id is not set
@@ -74,9 +74,9 @@ class Book():
     
     ### Used by @app.route("/books", methods=["POST"]) ###
     
-    def write_role_annotations(self, book_id, user_id, form_annotations):
+    def write_role_annotations(self, book_id, session_id, form_annotations):
         # book is a container for characters
-        book = self.parse_characters(book_id, user_id)
+        book = self.parse_characters(book_id, session_id)
         
         # using this to map character names to ids and checking if annotation exists
         char_name_to_id = {}
@@ -91,25 +91,25 @@ class Book():
                 char_id, char_role = char_name_to_id[key.split('-')[1]]
                 if char_role:
                     updates.append({
-                        "user_id": user_id,
+                        "session_id": session_id,
                         "char_id": char_id,
                         "role": value
                     })
                 else:
                     inserts.append({
-                        "user_id": user_id,
+                        "session_id": session_id,
                         "char_id": char_id,
                         "role": value
                     })
 
         # persistance operations; we could also use soft updates and store all as inserts
         if len(inserts) > 0:
-            sql = "INSERT INTO role_annotations (user_id, char_id, role) VALUES (:user_id, :char_id, :role)"
+            sql = "INSERT INTO role_annotations (session_id, char_id, role) VALUES (:session_id, :char_id, :role)"
             self.db.session.execute(sql, inserts)
             self.db.session.commit()
         
         if len(updates) > 0:
-            sql = "UPDATE role_annotations SET user_id=:user_id, role=:role WHERE char_id=:char_id"
+            sql = "UPDATE role_annotations SET session_id=:session_id, role=:role WHERE char_id=:char_id"
             self.db.session.execute(sql, updates)
             self.db.session.commit()
     

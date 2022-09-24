@@ -6,11 +6,11 @@ class Arc():
     def __init__(self, db):
         self.db = db
     
-    def create(self, book_id, user_id, title, short_desc):
-        sql = "INSERT INTO annotation_arc (user_id, book_id, title, short_desc) VALUES (:user_id, :book_id, :title, :short_desc)"
+    def create(self, book_id, session_id, title, short_desc):
+        sql = "INSERT INTO annotation_arc (session_id, book_id, title, short_desc) VALUES (:session_id, :book_id, :title, :short_desc)"
         self.db.session.execute(sql, 
             {
-                "user_id": user_id, 
+                "session_id": session_id, 
                 "book_id": book_id, 
                 "title": title, 
                 "short_desc": short_desc
@@ -18,8 +18,8 @@ class Arc():
         )
         self.db.session.commit()
     
-    def read_for_tasks(self, book_id, user_id):
-        arcs = self._read_arcs(book_id, user_id)
+    def read_for_tasks(self, book_id, session_id):
+        arcs = self._read_arcs(book_id, session_id)
         
         arc_list = []
         for arc in arcs:
@@ -72,8 +72,8 @@ class Arc():
         return arc_view
             
     
-    def read(self, book_id, user_id):
-        arcs = self._read_arcs(book_id, user_id)
+    def read(self, book_id, session_id):
+        arcs = self._read_arcs(book_id, session_id)
         
         ids = []
         arc_list = []
@@ -100,12 +100,12 @@ class Arc():
             ret.append(arc_view)
         return ret
     
-    def _read_arcs(self, book_id, user_id):
-        sql = "SELECT id, title, short_desc FROM annotation_arc WHERE user_id=:user_id AND book_id=:book_id"
+    def _read_arcs(self, book_id, session_id):
+        sql = "SELECT id, title, short_desc FROM annotation_arc WHERE session_id=:session_id AND book_id=:book_id"
         return self.db.session.execute(
             sql,
             {
-                "user_id": user_id,
+                "session_id": session_id,
                 "book_id": book_id
             }
         )
@@ -169,20 +169,20 @@ class Arc():
         return plot_point, theme, note       
 
     # Should perhaps be create or update
-    def update_annotations(self, book_id, user_id, arc_id, form_data):
+    def update_annotations(self, book_id, session_id, arc_id, form_data):
         # check authorization
-        sql = "SELECT * FROM annotation_arc WHERE user_id=:user_id AND book_id=:book_id AND id=:arc_id"
+        sql = "SELECT * FROM annotation_arc WHERE session_id=:session_id AND book_id=:book_id AND id=:arc_id"
         result = self.db.session.execute(
             sql,
             {
-                "user_id": user_id,
+                "session_id": session_id,
                 "book_id": book_id,
                 "arc_id": arc_id
             }
         ).fetchall()
         
         if len(result) != 1:
-            print("Unoauthorized user", user_id, book_id, arc_id)
+            print("Unoauthorized user", session_id, book_id, arc_id)
         
         self._update_mice_annotations(arc_id, form_data)
         self._update_ppp_annotations(arc_id, form_data)
